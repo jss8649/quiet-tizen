@@ -11,15 +11,18 @@ macOS/Linux shell; adapt the shell syntax if using Windows.
 ```sh
 export SDB=/absolute/path/to/tizen-studio/tools/sdb
 export TV_IP=192.0.2.50
-# Replace the example IP above. Read this string on YOUR TV; do not guess it.
-export TV_FIRMWARE='T-KSU2EFAKUC-0090-1300.9'
-tv() { python3 tools/tv.py --host "$TV_IP" --firmware "$TV_FIRMWARE" "$@"; }
+# Replace the example IP above with YOUR TV's address.
+tv() { python3 tools/tv.py --host "$TV_IP" "$@"; }
 python3 tools/build.py payloads
 ```
 
-`192.0.2.50` is a documentation address, not a real target. The firmware
-argument records what the operator verified on screen. The helper separately
-checks the model reported by SDB and rejects other model/firmware combinations.
+`192.0.2.50` is a documentation address, not a real target. The helper reads
+the model from SDB and the Software Version from the TV's `/etc/prd_info.ini`,
+prints both, and rejects other model/firmware combinations. Compare the
+printed version with Settings → Support → About This TV. If the TV does not
+report it, add `--firmware` with the exact Software Version from that screen;
+do not guess it. When given, `--firmware` takes precedence over the reported
+version.
 
 ## Enable Developer Mode on the TV
 

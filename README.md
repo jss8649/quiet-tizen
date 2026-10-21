@@ -86,9 +86,9 @@ TV**. This matters especially for private Samsung APIs and registry schemas.
 9. [Restore the original experience](docs/09-recovery.md).
 
 Read [AGENTS.md](AGENTS.md) before using the tools. TV commands require a
-specific address and a verified firmware declaration. All downloaded
-proprietary references, local artwork, snapshots and session records stay
-under ignored paths.
+specific address; they read the model and firmware from the TV and check them.
+All downloaded proprietary references, local artwork, snapshots and session
+records stay under ignored paths.
 
 ## Development
 

@@ -48,12 +48,31 @@ def observed_model(client):
     return rows[0][-1]
 
 
-def check_identity(model, firmware):
+def parse_firmware(prd_info):
+    match = re.search(r"^Version=([^;\s]+);?\s*$", prd_info, re.MULTILINE)
+    return match.group(1) if match else None
+
+
+def observed_firmware(client, callback_host=None):
+    # The same string About This TV shows as Software Version; readable without root.
+    # A truncated reply parses as "not detected", which the identity gate refuses.
+    result = client.capture("cat /etc/prd_info.ini 2>/dev/null || true",
+                            callback_host=callback_host, timeout=15)
+    return parse_firmware(result.output)
+
+
+def check_model(model):
     if model != PROFILE["model"]:
         raise ValueError(f"Unsupported model {model!r}; stop and investigate a separate profile.")
+
+
+def check_identity(model, firmware):
+    check_model(model)
+    if firmware is None:
+        raise ValueError("Firmware not detected; supply --firmware with the exact Software Version "
+                         "from About This TV. Do not guess this value.")
     if firmware != PROFILE["firmware"]:
-        raise ValueError("Supply --firmware with the exact version read from About This TV. "
-                         "Only the documented build is accepted. Do not guess this value.")
+        raise ValueError(f"Unsupported firmware {firmware!r}; only the documented build is accepted.")
 
 
 def pull_command(remote):
@@ -88,7 +107,8 @@ def main():
     os.umask(0o077)
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--host", required=True, help="The owner's TV IPv4 address; never auto-discovered")
-    parser.add_argument("--firmware", help="Operator-verified version from the TV's About screen")
+    parser.add_argument("--firmware", help="Software Version from About This TV; "
+                        "overrides the version the TV reports")
     parser.add_argument("--sdb", help="Path to Samsung's separately installed SDB")
     parser.add_argument("--callback-host", help="This computer's LAN IPv4 if route detection is wrong")
     sub = parser.add_subparsers(dest="action", required=True)
@@ -114,14 +134,19 @@ def main():
     client = SdbClient(find_sdb(), args.host, timeout=15)
     model = observed_model(client)
     print("SDB model:", model)
+    if args.action != "doctor":
+        # Reading the firmware already runs a command on the TV; refuse other models first.
+        check_model(model)
+    firmware = args.firmware or observed_firmware(client, args.callback_host)
+    print("Firmware:", firmware or "not detected; must be read on the TV.")
     if args.action == "doctor":
         assessment = _check_target(client)
         print("Archive-route runtime family:", assessment.runtime)
         print(assessment.capabilities)
         print(_capture(client, "uname -srmo; readlink -f /usr/share/dotnet.tizen/netcoreapp"))
-        print("Preflight only. Firmware must be read on the TV; root is not yet confirmed.")
+        print("Preflight only; root is not yet confirmed.")
         return
-    check_identity(model, args.firmware)
+    check_identity(model, firmware)
     if args.action == "push":
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,100}", args.name):
             raise ValueError("Use a simple staging filename without directory components.")

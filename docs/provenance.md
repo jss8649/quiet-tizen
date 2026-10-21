@@ -29,7 +29,7 @@ resolve `/usr/share/dotnet.tizen/netcoreapp`, require `libcoreclr.so` and
 `System.Private.CoreLib.dll`, then derive the runtime version from that path.
 Other preflight errors still fail. This fallback was used on the actual TV.
 
-The new `tools/tv.py` wrapper adds explicit model/declared-firmware gating,
+The new `tools/tv.py` wrapper adds explicit model/firmware gating,
 private local storage, bounded checksum-verified file transfer and reviewed
 single-command execution. Those generalized conveniences were locally
 tested; they are not a claim of end-to-end testing on additional hardware.

@@ -9,9 +9,10 @@ Samsung-wide debloat list.
 
 Work only on the TV the owner identifies. Use its explicit IP address; do not
 scan the whole network or reuse another person's saved device identity.
-Discover the installed app IDs and schemas on that TV. Read firmware from
-About This TV; the helper's --firmware value is an operator declaration,
-not a value it has independently read. SDB's reported model is checked.
+Discover the installed app IDs and schemas on that TV. The helper checks the
+model reported by SDB and the Software Version in `/etc/prd_info.ini`; compare
+it with About This TV. If the TV does not report it, pass --firmware with the
+version read from that screen; when given, --firmware takes precedence.
 
 Use the owner's current authorization and feature preferences. Ask only for
 missing decisions or observations that matter. Do not invent extra approval

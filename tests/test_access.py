@@ -2,13 +2,15 @@ import base64
 import gzip
 import hashlib
 from pathlib import Path
+import subprocess
 import sys
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
-from tv import check_identity, decode_pull, private_path, PROFILE
+import tv
+from tv import check_identity, decode_pull, observed_firmware, parse_firmware, private_path, PROFILE
 
 
 class AccessTests(unittest.TestCase):
@@ -20,6 +22,30 @@ class AccessTests(unittest.TestCase):
             check_identity(PROFILE["model"], "ANOTHER_FIRMWARE")
         with self.assertRaises(ValueError):
             check_identity(PROFILE["model"], None)
+
+    def test_unsupported_model_is_refused_before_any_tv_command(self):
+        with patch("tv.SdbClient"), patch("tv.find_sdb"), \
+                patch("tv.observed_model", return_value="ANOTHER_MODEL"), \
+                patch("tv.observed_firmware") as firmware, \
+                patch("sys.argv", ["tv.py", "--host", "192.0.2.50", "exec", "--command", "true"]), \
+                patch("sys.stdout"):
+            with self.assertRaisesRegex(ValueError, "Unsupported model"):
+                tv.main()
+        firmware.assert_not_called()
+
+    def test_firmware_is_read_from_product_info(self):
+        prd_info = ("[Version]\nModel=T-EXAMPLE-0000;\nVersion=T-EXAMPLE-0000-1000.0;\n"
+                    "Build=EXAMPLE-RELEASE;\n\n[Build]\nDate=2026-01-01;\n")
+        self.assertEqual(parse_firmware(prd_info), "T-EXAMPLE-0000-1000.0")
+        self.assertIsNone(parse_firmware("[Version]\nModel=T-EXAMPLE-0000;\n"))
+        # A TV without the file must yield "unknown", not a failed SDB command.
+        client = Mock()
+        client.capture.return_value.output = "\n[exit:0]\n"
+        self.assertIsNone(observed_firmware(client, "192.0.2.10"))
+        self.assertEqual(client.capture.call_args.kwargs["callback_host"], "192.0.2.10")
+        command = client.capture.call_args.args[0].replace("/etc/prd_info.ini", "/nonexistent/prd_info.ini")
+        result = subprocess.run(["sh", "-c", command], capture_output=True)
+        self.assertEqual((result.returncode, result.stdout), (0, b""))
 
     def test_transfer_integrity(self):
         payload = b"synthetic contents only" * 100
