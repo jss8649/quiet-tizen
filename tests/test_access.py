@@ -2,13 +2,14 @@ import base64
 import gzip
 import hashlib
 from pathlib import Path
+import subprocess
 import sys
 import unittest
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
-from tv import check_identity, decode_pull, private_path, PROFILE
+from tv import check_identity, decode_pull, private_path, script_command, PROFILE
 
 
 class AccessTests(unittest.TestCase):
@@ -20,6 +21,12 @@ class AccessTests(unittest.TestCase):
             check_identity(PROFILE["model"], "ANOTHER_FIRMWARE")
         with self.assertRaises(ValueError):
             check_identity(PROFILE["model"], None)
+
+    def test_script_reaches_shell_decoded_with_arguments(self):
+        script = b'#!/bin/sh\nprintf "%s|" "$@"\n'
+        command = script_command(script, ["home-01", "two words", "it's"])
+        result = subprocess.run(["sh", "-c", command], check=True, capture_output=True)
+        self.assertEqual(result.stdout, b"home-01|two words|it's|")
 
     def test_transfer_integrity(self):
         payload = b"synthetic contents only" * 100

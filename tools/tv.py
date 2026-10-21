@@ -56,6 +56,12 @@ def check_identity(model, firmware):
                          "Only the documented build is accepted. Do not guess this value.")
 
 
+def script_command(script, arguments):
+    # Base64 keeps the script intact through the command channel; decode it before sh reads it.
+    encoded = base64.b64encode(script).decode()
+    return f"printf '%s' {shlex.quote(encoded)} | base64 -d | /bin/sh -s -- " + shlex.join(arguments)
+
+
 def pull_command(remote):
     if not remote.startswith("/") or "\0" in remote or "\n" in remote:
         raise ValueError("Use an absolute, single-line TV file path.")
@@ -145,8 +151,7 @@ def main():
         script = args.script.read_bytes()
         if len(script) > 45000:
             raise ValueError("Script too large for the bounded command channel; split into phases.")
-        encoded = base64.b64encode(script).decode()
-        command = f"printf '%s' {shlex.quote(encoded)} | /bin/sh -s -- " + shlex.join(args.arg)
+        command = script_command(script, args.arg)
     else:
         if args.arg:
             raise ValueError("--arg requires --script.")
