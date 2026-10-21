@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Build locally; never redistribute Samsung reference assemblies."""
 import argparse
+import json
 import os
 from pathlib import Path
 import shutil
@@ -14,6 +15,8 @@ def main():
     parser.add_argument("target", choices=["payloads", "launcher", "all"])
     parser.add_argument("--dotnet", default=os.environ.get("DOTNET", "dotnet"))
     parser.add_argument("--framework", type=Path, default=ROOT / ".local/tv-framework")
+    parser.add_argument("--profile", type=Path, default=ROOT / "profiles/un75u8000ffxza-1300.9.json",
+                        help="TV profile whose launcher container Quiet Home replaces")
     args = parser.parse_args()
     jobs = []
     if args.target in ("payloads", "all"):
@@ -23,9 +26,12 @@ def main():
         for name in ("Tizen.NUI", "Tizen.Applications.Common", "Tizen.System", "Tizen"):
             if not (args.framework / f"{name}.dll").is_file():
                 parser.error(f"Missing {name}.dll. Read docs/04-launcher.md; these are not bundled.")
-        for name in ("Home", "QuickLaunch"):
-            jobs.append((ROOT / f"launcher/src/{name}.csproj", name, name,
-                         [f"-p:TV_FRAMEWORK_DIR={args.framework.resolve()}"]))
+        launcher = json.loads(args.profile.read_text())["launcher"]
+        home_dll = launcher["dll"]
+        common = [f"-p:TV_FRAMEWORK_DIR={args.framework.resolve()}", f"-p:QuietHomeAppId={launcher['app_id']}"]
+        jobs.append((ROOT / "launcher/src/Home.csproj", "Home", "Home",
+                     [*common, f"-p:AssemblyName={Path(home_dll).stem}"]))
+        jobs.append((ROOT / "launcher/src/QuickLaunch.csproj", "QuickLaunch", "QuickLaunch", common))
         jobs.append((ROOT / "launcher/probe/Probe.csproj", "Probe", "Probe", []))
     for project, output, intermediate, extra in jobs:
         subprocess.run([
@@ -37,13 +43,14 @@ def main():
         ], check=True, env={**os.environ, "DOTNET_CLI_TELEMETRY_OPTOUT": "1"})
     if args.target in ("launcher", "all"):
         destination = ROOT / ".local/package"
-        destination.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(ROOT / ".local/build/Home/BixbyPromotion.dll", destination / "BixbyPromotion.dll")
+        # Start clean so a previous profile's entry assembly is never packaged.
+        if destination.exists():
+            shutil.rmtree(destination)
+        destination.mkdir(parents=True)
+        shutil.copyfile(ROOT / ".local/build/Home" / home_dll, destination / home_dll)
         shutil.copyfile(ROOT / ".local/build/QuickLaunch/QuickLaunch.dll", destination / "QuickLaunch.dll")
         shutil.copyfile(ROOT / ".local/build/Probe/Probe.dll", destination / "Probe.dll")
         assets = destination / "quiet-home"
-        if assets.exists():
-            shutil.rmtree(assets)
         shutil.copytree(ROOT / "launcher/assets", assets)
         local_catalog = ROOT / "launcher/assets/apps.local.json"
         if local_catalog.exists():

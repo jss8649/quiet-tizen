@@ -8,18 +8,34 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
-from tv import check_identity, decode_pull, private_path, PROFILE
+from tv import check_identity, decode_pull, private_path, PROFILES
 
 
 class AccessTests(unittest.TestCase):
     def test_target_identity_gate(self):
-        check_identity(PROFILE["model"], PROFILE["firmware"])
-        with self.assertRaises(ValueError):
-            check_identity("ANOTHER_MODEL", PROFILE["firmware"])
-        with self.assertRaises(ValueError):
-            check_identity(PROFILE["model"], "ANOTHER_FIRMWARE")
-        with self.assertRaises(ValueError):
-            check_identity(PROFILE["model"], None)
+        for profile in PROFILES:
+            with self.subTest(model=profile["model"]):
+                check_identity(profile["model"], profile["firmware"])
+                with self.assertRaises(ValueError):
+                    check_identity("ANOTHER_MODEL", profile["firmware"])
+                with self.assertRaises(ValueError):
+                    check_identity(profile["model"], "ANOTHER_FIRMWARE")
+                with self.assertRaises(ValueError):
+                    check_identity(profile["model"], None)
+
+    def test_one_models_firmware_never_unlocks_another(self):
+        builds = {(profile["model"], profile["firmware"]) for profile in PROFILES}
+        crossed = [(model, firmware) for model, _ in builds for other, firmware in builds
+                   if other != model and (model, firmware) not in builds]
+        self.assertTrue(crossed, "needs profiles for at least two models")
+        for model, firmware in crossed:
+            with self.subTest(model=model, firmware=firmware):
+                with self.assertRaises(ValueError):
+                    check_identity(model, firmware)
+
+    def test_each_model_firmware_pair_has_one_profile(self):
+        pairs = [(profile["model"], profile["firmware"]) for profile in PROFILES]
+        self.assertEqual(len(pairs), len(set(pairs)))
 
     def test_transfer_integrity(self):
         payload = b"synthetic contents only" * 100

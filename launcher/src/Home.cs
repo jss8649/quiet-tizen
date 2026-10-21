@@ -10,7 +10,7 @@ using Tizen.Applications;
 
 public sealed class QuietHome : NUIApplication
 {
- const string Root="/opt/usr/apps/com.samsung.tv.bixby-promotion/res/quiet-home/";
+ const string Root="/opt/usr/apps/"+QuietHomeContainer.AppId+"/res/quiet-home/";
  const string StateFile="/tmp/quiet-home-state.txt";
  sealed class Slot { public View Card,Shadow,FocusRing; public TextLabel Label; public string Name,Action,Description; public int Row,X,Y,W,H; }
  sealed class CachedArtwork { public ImageView Image; public View Parent; }

@@ -17,7 +17,7 @@ public sealed class QuickLaunch : NUIApplication {
   base.OnAppControlReceived(e);string kind;bool preload=e.ReceivedAppControl.ExtraData.TryGet("launch_type",out kind)&&kind=="preload";
   int result=0;
   if(!preload){IntPtr c;result=app_control_create(out c);if(result==0){try{
-   result=app_control_set_app_id(c,"com.samsung.tv.bixby-promotion");
+   result=app_control_set_app_id(c,QuietHomeContainer.AppId);
    if(result==0)result=app_control_set_operation(c,"http://tizen.org/appcontrol/operation/default");
    if(result==0)result=app_control_add_extra_data(c,"quiet_page","settings");
    if(result==0)result=app_control_send_launch_request(c,IntPtr.Zero,IntPtr.Zero);

@@ -17,6 +17,7 @@ __pycache__/
 *.token
 *.log
 *.zip
-*.tar*
+*.tar
+*.tar.*
 launcher/assets/app-icons/
 launcher/assets/apps.local.json

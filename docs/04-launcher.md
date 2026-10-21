@@ -32,7 +32,10 @@ python3 tools/build.py launcher --framework .local/tv-framework
 ```
 
 This builds `BixbyPromotion.dll`, `QuickLaunch.dll` and `Probe.dll`, then
-assembles `.local/package/`. Public source cards are neutral text placeholders;
+assembles `.local/package/`. For another documented model, add its profile, for
+example `--profile profiles/qe65s95fauxru-1301.0.json`; the profile's
+`launcher` block names the host package and the entry assembly to build.
+Public source cards are neutral text placeholders;
 [optional publisher artwork](06-artwork.md) can be fetched before rebuilding.
 
 ## Adapt inputs and apps
@@ -55,7 +58,7 @@ is read from `apps.json`; verify all app IDs against the TV. See
 
 ## Install without changing Home yet
 
-The tested native-app container is **`com.samsung.tv.bixby-promotion`**.
+On the U8000F the native-app container is **`com.samsung.tv.bixby-promotion`**.
 Its `BixbyPromotion.dll` is replaced with our assembly, while the package's
 existing identity, metadata and framework integration are retained. This
 replaces Bixby Promotion's function. It is not a store-signed standalone TPK.
@@ -70,6 +73,20 @@ tar -czf .local/package.tar.gz -C .local/package .
 tv push .local/package.tar.gz package.tar.gz
 tv exec --script recipes/install-launcher.sh --arg home-01
 ```
+
+Another profile can name a different host in its `launcher` block. The
+QE65S95F profile uses `com.samsung.tv.adplayer` and `AdPlayer.dll`, because
+Bixby Promotion is not installed there. Append both values to the last
+command above, so it becomes:
+
+```sh
+tv exec --script recipes/install-launcher.sh --arg home-01 \
+  --arg com.samsung.tv.adplayer --arg AdPlayer.dll
+```
+
+Append them later to `restore-launcher.sh` as well, and use that app ID in the
+Home and startup commands. The settings-bridge recipes still target Bixby
+Promotion only.
 
 The recipe backs up the original package before replacing the assembly,
 moves the cached native image out of the execution path, installs resources,

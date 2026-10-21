@@ -4,6 +4,7 @@
   <UseAppHost>false</UseAppHost><EnableDefaultCompileItems>false</EnableDefaultCompileItems><DebugType>none</DebugType><ImplicitUsings>disable</ImplicitUsings><Nullable>disable</Nullable>
  </PropertyGroup>
  <ItemGroup><Compile Include="Home.cs" /><Compile Include="AppLibrary.cs" /></ItemGroup>
+ <Import Project="QuietHomeContainer.targets" />
  <ItemGroup>
   <Reference Include="Tizen.NUI"><HintPath>$(TV_FRAMEWORK_DIR)/Tizen.NUI.dll</HintPath><Private>false</Private></Reference>
   <Reference Include="Tizen.Applications.Common"><HintPath>$(TV_FRAMEWORK_DIR)/Tizen.Applications.Common.dll</HintPath><Private>false</Private></Reference>

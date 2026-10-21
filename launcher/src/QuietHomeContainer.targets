@@ -1,0 +1,12 @@
+<Project>
+ <!-- Quiet Home runs inside an existing native package named by the TV profile (tools/build.py). -->
+ <PropertyGroup>
+  <QuietHomeAppId Condition="'$(QuietHomeAppId)' == ''">com.samsung.tv.bixby-promotion</QuietHomeAppId>
+ </PropertyGroup>
+ <Target Name="GenerateQuietHomeContainer" BeforeTargets="CoreCompile">
+  <PropertyGroup><QuietHomeContainerSource>$(IntermediateOutputPath)QuietHomeContainer.g.cs</QuietHomeContainerSource></PropertyGroup>
+  <WriteLinesToFile File="$(QuietHomeContainerSource)" Overwrite="true" WriteOnlyWhenDifferent="true"
+   Lines="static class QuietHomeContainer { public const string AppId=&quot;$(QuietHomeAppId)&quot;%3B }" />
+  <ItemGroup><Compile Include="$(QuietHomeContainerSource)" /><FileWrites Include="$(QuietHomeContainerSource)" /></ItemGroup>
+ </Target>
+</Project>
