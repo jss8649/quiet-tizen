@@ -21,12 +21,20 @@ class PackageTests(unittest.TestCase):
             self.assertTrue((ROOT / "launcher/assets" / asset).is_file(), asset)
         self.assertEqual(sum(bool(a.get("Utility")) for a in catalog), 1)
 
-    def test_profile_has_no_duplicate_app_ids_or_essential_containers(self):
-        profile = json.loads((ROOT / "profiles/un75u8000ffxza-1300.9.json").read_text())
-        ids = [app for group in profile["groups"].values() for app in group["app_ids"]]
-        self.assertEqual(len(ids), len(set(ids)))
-        for essential in ("com.samsung.tv.bixby-promotion", "org.tizen.menu", "com.samsung.tv.quicklaunch"):
-            self.assertNotIn(essential, ids)
+    def test_profiles_have_no_duplicate_app_ids_or_essential_containers(self):
+        for path in sorted((ROOT / "profiles").glob("*.json")):
+            with self.subTest(profile=path.name):
+                profile = json.loads(path.read_text())
+                ids = [app for group in profile.get("groups", {}).values() for app in group["app_ids"]]
+                self.assertEqual(len(ids), len(set(ids)))
+                essentials = ["org.tizen.menu", "com.samsung.tv.quicklaunch"]
+                if "launcher" in profile:
+                    # Quiet Home replaces this container's entry assembly; never a cleanup target.
+                    self.assertRegex(profile["launcher"]["app_id"], r"^[A-Za-z0-9_.-]+$")
+                    self.assertRegex(profile["launcher"]["dll"], r"^[A-Za-z0-9_.-]+\.dll$")
+                    essentials.append(profile["launcher"]["app_id"])
+                for essential in essentials:
+                    self.assertNotIn(essential, ids)
 
     def test_shell_syntax(self):
         for path in (ROOT / "recipes").glob("*.sh"):

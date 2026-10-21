@@ -6,6 +6,10 @@
   "kernel": "Linux 5.4.261 ARMv7",
   "runtime": "6.0.9",
   "registry": "/opt/dbspace/.pkgmgr_parser.db",
+  "launcher": {
+    "app_id": "com.samsung.tv.bixby-promotion",
+    "dll": "BixbyPromotion.dll"
+  },
   "groups": {
     "advertising": {
       "description": "ACR, viewing-analysis, promotion and advertising components. Package names identify purpose; this is not a traffic audit.",

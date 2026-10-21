@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Explicit-target access for the documented U8000F profile. See docs/02-access.md."""
+"""Explicit-target access for TVs with a documented profile. See docs/02-access.md."""
 import argparse
 import asyncio
 import base64
@@ -19,7 +19,7 @@ sys.path.insert(0, str(ROOT / "vendor"))
 from samsung_tv_root.archive_root import probe, _check_target, _capture
 from samsung_tv_root.sdb import SdbClient, find_sdb
 
-PROFILE = json.loads((ROOT / "profiles/un75u8000ffxza-1300.9.json").read_text())
+PROFILES = [json.loads(path.read_text()) for path in sorted((ROOT / "profiles").glob("*.json"))]
 STAGE = "/home/owner/share/tmp/sdk_tools/quiet-tizen"
 
 
@@ -49,11 +49,12 @@ def observed_model(client):
 
 
 def check_identity(model, firmware):
-    if model != PROFILE["model"]:
+    builds = [profile["firmware"] for profile in PROFILES if profile["model"] == model]
+    if not builds:
         raise ValueError(f"Unsupported model {model!r}; stop and investigate a separate profile.")
-    if firmware != PROFILE["firmware"]:
+    if firmware not in builds:
         raise ValueError("Supply --firmware with the exact version read from About This TV. "
-                         "Only the documented build is accepted. Do not guess this value.")
+                         "Only a documented build is accepted. Do not guess this value.")
 
 
 def pull_command(remote):

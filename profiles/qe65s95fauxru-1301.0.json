@@ -1,0 +1,12 @@
+{
+  "profile_version": 1,
+  "model": "QE65S95FAUXRU",
+  "firmware": "T-RSMFDEUC-0090-1301.0",
+  "os": "Tizen 9.0",
+  "kernel": "Linux 5.4.261 aarch64",
+  "runtime": "6.0.9",
+  "launcher": {
+    "app_id": "com.samsung.tv.adplayer",
+    "dll": "AdPlayer.dll"
+  }
+}
