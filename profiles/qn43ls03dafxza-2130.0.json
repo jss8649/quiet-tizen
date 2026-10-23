@@ -1,0 +1,134 @@
+{
+  "profile_version": 1,
+  "model": "QN43LS03DAFXZA",
+  "firmware": "T-PTMDAKUC-0090-2130.0",
+  "os": "Tizen 9.0.0 (Tizen9/TV)",
+  "kernel": "Linux 5.4.249 armv7l",
+  "runtime": "6.0.9",
+  "registry": "/opt/dbspace/.pkgmgr_parser.db",
+  "launcher_host": {
+    "package": "com.samsung.tv.tlog-guide",
+    "entry_assembly": "TlogGuide.dll",
+    "owner": "201:0",
+    "smack": "User::Pkg::com.samsung.tv.tlog-guide::RO",
+    "manifest_type": "ui-application",
+    "note": "The U8000F host (com.samsung.tv.bixby-promotion) is absent on this model. This native NUI ui-application was used instead; other candidates observed: com.samsung.tv.gamepadguide, com.samsung.tv.CinemaGraphApp, com.samsung.tv.mycontents."
+  },
+  "groups": {
+    "advertising": {
+      "description": "ACR, viewing-analysis, promotion and advertising components. The U8000F promotion IDs (yL49PNFmjW.*) are absent on this model; its promotion-like package is 9z6IujVul3.DeviceHome* (not included pending review).",
+      "app_ids": [
+        "com.samsung.tizen.samsung-analytics",
+        "com.samsung.tv.acr",
+        "com.samsung.tv.canalysis-service",
+        "com.samsung.tv.contents-recognition-dbmgr",
+        "com.samsung.tv.adagent-service",
+        "com.samsung.tv.pisa-service",
+        "org.tizen.pisa-control-service",
+        "com.samsung.tv.targeted-ad-service"
+      ]
+    },
+    "voice": {
+      "description": "Bixby, Alexa, wake-word and voice UI. Opt in only if voice functions are unwanted.",
+      "app_ids": [
+        "com.samsung.tv.alexa-client",
+        "com.samsung.tv.alexa-fullscreen-app",
+        "com.samsung.tv.bixby-context-client",
+        "com.samsung.tv.bixby-prov",
+        "com.samsung.tv.bixbycapsuleviewer",
+        "com.samsung.tv.mybixby",
+        "com.samsung.tv.ondevice-voice",
+        "com.samsung.tv.utterance-recommender-app",
+        "com.samsung.tv.utterance-recommender-core",
+        "com.samsung.tv.voice-instant-app",
+        "com.samsung.tv.voiceassistant-music",
+        "com.samsung.tv.wakeup-engine-alexa",
+        "com.samsung.tv.wakeup-engine-bixby",
+        "org.tizen.voice-app",
+        "org.tizen.voice-app-service",
+        "org.tizen.voice-client",
+        "org.tizen.voice-onboarding"
+      ]
+    },
+    "context": {
+      "description": "AI/context suggestions and content-grab features. The U8000F ai-discovery IDs are absent on this model.",
+      "app_ids": [
+        "com.samsung.tv.AICompanionAgent",
+        "com.samsung.tv.AICompanionUI",
+        "com.samsung.tv.AICompanionUILauncher",
+        "com.samsung.tv.AICompanionUINotice",
+        "com.samsung.tv.context-aware-agent",
+        "com.samsung.tv.context-aware-agent-toast-view",
+        "com.samsung.tv.context-aware-grab-control",
+        "com.samsung.tv.context-aware-server-requester",
+        "com.samsung.tv.context-aware-service",
+        "com.samsung.tv.vif",
+        "content-grab-service"
+      ]
+    },
+    "smart-extras": {
+      "description": "SmartThings, gaming-hub background helpers, health and ambience. Optional; HDMI-focused setup.",
+      "app_ids": [
+        "com.samsung.tizen.smartthings-client",
+        "com.samsung.tv.adplayer",
+        "com.samsung.tv.ambient-sound",
+        "com.samsung.tv.aov-dashboard",
+        "com.samsung.tv.ghdaemon",
+        "com.samsung.tv.ghservice",
+        "com.samsung.tv.health-mde-service",
+        "com.samsung.tv.health-mde-service-view",
+        "com.samsung.tv.smartthingsfind-daemon",
+        "com.samsung.tv.smartthingsfind-ondemand",
+        "samsunghealth-service-tv"
+      ]
+    },
+    "light-shell": {
+      "description": "Sidebar and browser. Apply only after launcher, QuickLaunch bridge and settings routing are validated.",
+      "app_ids": [
+        "com.samsung.tv.home.sidebar",
+        "org.tizen.browser"
+      ]
+    },
+    "tv-plus": {
+      "description": "Samsung TV Plus startup. Removes access to that app until restored.",
+      "app_ids": [
+        "HEPsqFNie0.tvplusstandalone"
+      ]
+    }
+  },
+  "stop_markers": [
+    { "unit": "pisa-service.service", "marker": "pisa-service", "group": "advertising" },
+    { "unit": "canalysis-service.service", "marker": "canalysis-daemon", "group": "advertising" },
+    { "unit": "adagent-service.service", "marker": "pisa-service", "group": "advertising" },
+    { "unit": "slive-provider-daemon.service", "marker": "slive-provider-daemon", "group": "tv-plus" },
+    { "unit": "com.samsung.tv.bixby-prov.service", "marker": "com.samsung.tv.bixby-prov", "group": "voice" },
+    { "unit": "com.samsung.tv.ondevice-voice.service", "marker": "com.samsung.tv.ondevice-voice", "group": "voice" },
+    { "unit": "org.tizen.voice-app.service", "marker": "org.tizen.voice-app", "group": "voice" },
+    { "unit": "org.tizen.voice-client.service", "marker": "org.tizen.voice-client", "group": "voice" },
+    { "unit": "com.samsung.tv.context-aware-agent.service", "marker": "com.samsung.tv.context-aware-agent", "group": "context" },
+    { "unit": "com.samsung.tv.context-aware-service.service", "marker": "com.samsung.tv.context-aware-service", "group": "context" },
+    { "unit": "com.samsung.tv.AICompanionAgent.service", "marker": "com.samsung.tv.AICompanionAgent", "group": "context" },
+    { "unit": "com.samsung.tv.ghdaemon.service", "marker": "com.samsung.tv.ghdaemon", "group": "smart-extras" },
+    { "unit": "samsunghealth-service-tv.service", "marker": "samsunghealth-service-tv", "group": "smart-extras" }
+  ],
+  "runtime_only_masks": [
+    "ipa.service",
+    "contents-recognition-service.service",
+    "org.tizen.tv.sp-kpi.service",
+    "data-service.service"
+  ],
+  "preferences": [
+    { "key": "db/was/preload_by_country", "type": "string", "value": "false" },
+    { "key": "db/menu/autorun_tv_plus", "type": "bool", "value": "0" },
+    { "key": "db/menu/voice/voice_activated", "type": "bool", "value": "0" },
+    { "key": "db/menu/voice/wakeupless_status", "type": "int", "value": "0" },
+    { "key": "db/si_service/voice_recog_enable", "type": "bool", "value": "0" },
+    { "key": "db/multi-assistant/prelaunch_mode", "type": "bool", "value": "0" }
+  ],
+  "was_cache": {
+    "table": "WASConfigTable",
+    "row": "RESERVED_18",
+    "json_path": "$.rsp.preloadByCountry",
+    "after": "false"
+  }
+}
