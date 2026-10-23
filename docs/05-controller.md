@@ -20,6 +20,47 @@ Implementation: the launcher requests `org.tizen.menu` with
 internal “keyboard” name, this route reached the native Bluetooth list used
 for the DualSense on the tested firmware.
 
+## Native popups ignore remote arrows
+
+On a **UN55DU6900FXZC**, software **T-KSU2EDAKUC-1400.0** (Tizen 8,
+ARMv7, .NET 6.0.9), the Samsung remote could navigate the main native Settings
+screen and select a paired controller, but arrows would not move between
+buttons inside its Bluetooth and confirmation popups. Ordinary directional
+events reached the menu process; equivalent keypad directions moved the
+popup selection. The owner confirmed working popup navigation after the fix.
+
+Quiet Home now yields keyboard focus while the native menu is open and
+restores it on return. For affected firmware, an optional QuickLaunch input
+bridge translates only the four directions to their keypad equivalents.
+Select and Back stay with Samsung's menu. It releases its key grabs and input
+device and exits when the native menu closes; normal settings-shortcut and
+preload requests retain their existing behavior.
+
+Build and install **both** updated `BixbyPromotion.dll` and `QuickLaunch.dll`,
+retaining backups of both previous assemblies. Check that QuickLaunch's
+existing manifest grants `http://tizen.org/privilege/keygrab` and that the
+firmware provides `libautoinput.so.0`. The Home container does not have that
+key-capture privilege. No additional permission or root service is needed.
+
+Enable the workaround only on firmware exhibiting this problem:
+
+```sh
+tv exec --command 'touch /opt/usr/apps/com.samsung.tv.bixby-promotion/res/quiet-home/native-settings-keypad-arrows'
+```
+
+Remove that marker to disable translation for subsequent menu sessions.
+The marker is deliberately opt-in: this translation was not tested on the
+original Tizen 9 case-study TV. This report does not expand the cleanup/root
+profile's model gate or establish reboot/standby compatibility for the DU6900.
+The marker activation itself was added for upstream use after the owner's
+hardware test; the deployed repair enabled the same bridge unconditionally.
+
+Test with the physical remote: Down to Scan/Stop, Left/Right between bottom
+buttons, and navigation inside Cancel/Unpair without confirming a device
+change. Then use Back/Home and check launcher navigation. Local overwritten
+state is available in `/tmp/quiet-home-focus.txt` and
+`/tmp/quiet-native-input.txt`; keep these files private.
+
 Preserve Bluetooth and gamepad services during cleanup. The TV's input stack
 delivers navigation events; support within streaming and cloud-gaming apps
 depends on those apps. Successful pairing does not guarantee every button,

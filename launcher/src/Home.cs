@@ -28,6 +28,10 @@ public sealed class QuietHome : NUIApplication
  Animation focusAnimation;
  bool fontLoaded;
  Tizen.NUI.Timer clockTimer;
+ Tizen.NUI.Timer focusHandoffTimer;
+ bool nativeMenuOpen,nativeMenuSeen,windowFocused=true;
+ long nativeMenuOpenedAt;
+ string nativeMenuState="",nativeMenuError="";
  int page, selected, area=1, lastSource=14;
  string editing="";
  long buildMilliseconds;
@@ -66,21 +70,73 @@ public sealed class QuietHome : NUIApplication
   base.OnCreate();
   try{fontLoaded=FontClient.Instance.AddCustomFontDirectory(Root+"fonts");}catch{fontLoaded=false;}
   try{library=AppLibrary.Load(Root+"apps.json");}catch(Exception ex){libraryError=ex.Message;}
-  Window.Default.BackgroundColor=new Color(0.96f,0.96f,0.97f,1);
-  Window.Default.Title="Quiet Home";Window.Default.KeyEvent+=OnKey;
+  NUIApplication.GetDefaultWindow().BackgroundColor=new Color(0.96f,0.96f,0.97f,1);
+  NUIApplication.GetDefaultWindow().Title="Quiet Home";NUIApplication.GetDefaultWindow().KeyEvent+=OnKey;
+  NUIApplication.GetDefaultWindow().FocusChanged+=(s,e)=>{
+   windowFocused=e.FocusGained;
+   if(windowFocused)nativeMenuOpen=false;
+   WriteState(windowFocused?"window_focused":"window_unfocused");
+  };
   PreloadArtwork();
   RefreshSource();selected=SourceIndex();BuildPage();
   clockTimer=new Tizen.NUI.Timer(30000);
   clockTimer.Tick+=(s,e)=>{if(clock!=null)clock.Text=DateTime.Now.ToString("h:mm tt");return true;};clockTimer.Start();WriteState("created");
  }
  protected override void OnResume(){base.OnResume();clockTimer?.Start();RefreshSource();if(tabs!=null&&page==2){RefreshSettings();UpdateFocus(false);}WriteState("resumed");}
- protected override void OnAppControlReceived(AppControlReceivedEventArgs e){base.OnAppControlReceived(e);string requested; if(e.ReceivedAppControl.ExtraData.TryGet("quiet_page",out requested)&&requested=="settings")OpenSettings("settings_request");else if(requested=="apps"){page=1;area=1;selected=0;BuildPage();}else Home("home_request");}
+ protected override void OnAppControlReceived(AppControlReceivedEventArgs e){base.OnAppControlReceived(e);RestoreLauncherFocus();string requested; if(e.ReceivedAppControl.ExtraData.TryGet("quiet_page",out requested)&&requested=="settings")OpenSettings("settings_request");else if(requested=="apps"){page=1;area=1;selected=0;BuildPage();}else Home("home_request");}
  protected override void OnPause(){base.OnPause();editing="";clockTimer?.Stop();WriteState("paused");}
- void Home(string activity){clockTimer?.Start();RefreshSource();if(tabs!=null){bool unchanged=page==0&&area==1&&editing==""&&selected==SourceIndex();page=0;area=1;editing="";selected=SourceIndex();if(!unchanged)BuildPage();WriteState(activity);}}
- void OpenSettings(string activity){clockTimer?.Start();page=2;area=1;selected=0;editing="";BuildPage();WriteState(activity);}
+ void RestoreLauncherFocus(){
+  nativeMenuOpen=false;focusHandoffTimer?.Stop();
+  var window=NUIApplication.GetDefaultWindow();
+  window.SetAcceptFocus(true);window.Show();window.Raise();window.Activate();
+  WriteFocusState("launcher_restored");
+ }
+ void WriteFocusState(string activity){try{File.WriteAllText("/tmp/quiet-home-focus.txt",DateTime.UtcNow.ToString("o")+"\nactivity="+activity+"\nnative_menu_open="+nativeMenuOpen+"\nnative_menu_state="+nativeMenuState+"\nwindow_focused="+windowFocused+"\naccept_focus="+NUIApplication.GetDefaultWindow().IsFocusAcceptable()+"\nerror="+nativeMenuError+"\n");}catch{}}
+ void YieldToNativeMenu(){
+  nativeMenuOpen=true;nativeMenuSeen=false;nativeMenuState="";nativeMenuError="";nativeMenuOpenedAt=Environment.TickCount64;editing="";
+  var window=NUIApplication.GetDefaultWindow();
+  // A transparent Samsung overlay can grab Select/Back while leaving the
+  // directional-key focus on our window. Release input focus while keeping
+  // our background in place underneath the native overlay.
+  window.SetAcceptFocus(false);
+  focusHandoffTimer?.Stop();focusHandoffTimer?.Dispose();
+  focusHandoffTimer=new Tizen.NUI.Timer(500);
+  focusHandoffTimer.Tick+=(s,e)=>{
+   // Both apps remain "Foreground" while Samsung's transparent overlay is
+   // open. Re-enabling our focus early steals its arrows again. Watch only
+   // this native session, then restore Home after the menu closes.
+   try{using(var context=new ApplicationRunningContext("org.tizen.menu")){
+    string state=context.State.ToString();
+    if(state!=nativeMenuState){nativeMenuState=state;WriteFocusState("native_state_changed");}
+    if(state=="Foreground"){
+     if(!nativeMenuSeen&&File.Exists(Root+"native-settings-keypad-arrows"))StartNativeInputBridge();
+     nativeMenuSeen=true;return true;
+    }
+    if(nativeMenuSeen||Environment.TickCount64-nativeMenuOpenedAt>3000){RestoreLauncherFocus();WriteState("native_menu_closed");return false;}
+   }}catch(Exception ex){nativeMenuError=ex.Message;WriteFocusState("native_state_error");}
+   return true;
+  };
+  focusHandoffTimer.Start();WriteFocusState("native_focus_handoff");WriteState("native_focus_handoff");
+ }
+ void StartNativeInputBridge(){
+  IntPtr control=bundle_create();if(control==IntPtr.Zero)return;
+  try{
+   bundle_add_str(control,"quiet_native_arrows","enable");
+   bundle_add_str(control,"__NO_RAISE_WINDOW","enable");
+   bundle_add_str(control,"__K_BG_LAUNCH","enable");
+   int result=aul_launch_app("com.samsung.tv.quicklaunch",control);
+   if(result<0){nativeMenuError="settings input launch: "+result;WriteFocusState("native_input_error");}
+  }finally{bundle_free(control);}
+ }
+ [DllImport("libbundle.so.0")] static extern IntPtr bundle_create();
+ [DllImport("libbundle.so.0")] static extern int bundle_add_str(IntPtr bundle,string key,string value);
+ [DllImport("libbundle.so.0")] static extern int bundle_free(IntPtr bundle);
+ [DllImport("libaul.so.0")] static extern int aul_launch_app(string id,IntPtr bundle);
+ void Home(string activity){RestoreLauncherFocus();clockTimer?.Start();RefreshSource();if(tabs!=null){bool unchanged=page==0&&area==1&&editing==""&&selected==SourceIndex();page=0;area=1;editing="";selected=SourceIndex();if(!unchanged)BuildPage();WriteState(activity);}}
+ void OpenSettings(string activity){RestoreLauncherFocus();clockTimer?.Start();page=2;area=1;selected=0;editing="";BuildPage();WriteState(activity);}
  void RefreshSource(){try{int n;if(vconf_get_int("memory/system/source_type",out n)==0&&n>=13&&n<=15)lastSource=n;}catch{}}
  int SourceIndex(){return lastSource==15?1:lastSource==13?2:0;}
- View Add(View v){scene.Add(v);Window.Default.Add(v);return v;}
+ View Add(View v){scene.Add(v);NUIApplication.GetDefaultWindow().Add(v);return v;}
  View Panel(int x,int y,int w,int h,Color color,int radius=18){return Add(new View{Position2D=new Position2D(x,y),Size2D=new Size2D(w,h),BackgroundColor=color,CornerRadius=new Vector4(radius,radius,radius,radius)});}
  TextLabel Text(string text,int x,int y,int w,int h,float size,Color color,string face="Medium")
  {return (TextLabel)Add(Label(text,x,y,w,h,size,color,face));}
@@ -91,7 +147,7 @@ public sealed class QuietHome : NUIApplication
   var stopwatch=Stopwatch.StartNew();
   if(focusAnimation!=null){focusAnimation.Stop();focusAnimation.Dispose();focusAnimation=null;}
   ParkArtwork();pageArtworkCold=0;
-  foreach(var v in scene){Window.Default.Remove(v);v.Dispose();}scene.Clear();slots.Clear();
+  foreach(var v in scene){NUIApplication.GetDefaultWindow().Remove(v);v.Dispose();}scene.Clear();slots.Clear();
   Add(new ImageView{ResourceUrl=Root+"free-background.svg",Size2D=new Size2D(1920,1080)});
   Text(page==0?"Home":page==1?"Your Apps":"Quick Settings",76,55,1350,100,76,ink,"Display");
   tabs=new TextLabel[3];string[] nav={"Inputs","Apps","Settings"};int[] tx={54,221,366};int[] tw={153,131,182};
@@ -179,7 +235,7 @@ public sealed class QuietHome : NUIApplication
   // Keep the real image views alive on the scene; moving between pages never
   // destroys their decoded textures. The zero-opacity parent is never drawn.
   artworkPreloadRoot=new View{Size2D=new Size2D(1920,1080),Opacity=0};
-  Window.Default.Add(artworkPreloadRoot);
+  NUIApplication.GetDefaultWindow().Add(artworkPreloadRoot);
   foreach(var app in library)if(!app.Utility)GetArtwork(app,328,184);
   foreach(var id in new[]{"org.tizen.netflix-app","com.samsung.tv.cobalt-yt","org.tizen.primevideo"}){
    var app=library.Find(a=>a.Id==id);if(app!=null)GetArtwork(app,253,126);
@@ -195,7 +251,6 @@ public sealed class QuietHome : NUIApplication
   var image=new ImageView{
    Position2D=new Position2D((w-iw)/2,(h-ih)/2),Size2D=new Size2D(iw,ih),
    FittingMode=cover?FittingModeType.ScaleToFill:FittingModeType.ShrinkToFit,
-   SamplingMode=SamplingModeType.BoxThenLanczos,
    DesiredWidth=(int)Math.Ceiling(iw*2/cropWidth),DesiredHeight=(int)Math.Ceiling(ih*2/cropHeight),
    ReleasePolicy=ReleasePolicyType.Destroyed,CornerRadius=new Vector4(18,18,18,18)};
   if(crop!=null)image.PixelArea=new RelativeVector4(crop[0],crop[1],crop[2],crop[3]);
@@ -304,6 +359,7 @@ public sealed class QuietHome : NUIApplication
   try{
    if(k=="XF86Home"){Home("home_key");return;}
    if(k=="XF86SysMenu"||k=="XF86More"){OpenSettings("settings_key");return;}
+   if(nativeMenuOpen||!windowFocused)return;
    if(page==1&&HandleLibraryKey(k))return;
    if(editing!=""){if(k=="Left"||k=="Right"){int d=k=="Left"?-1:1;if(editing=="volume")ChangeVolume(d);else ChangeBrightness(d);}else if(k=="Return"||k=="KP_Enter"||k=="XF86Back"||k=="Back"||k=="Escape"){editing="";UpdateFocus();}return;}
    if(k=="Up"){if(area==2){int col=Row(1).IndexOf(selected);area=1;selected=Row(0)[page==2?col:0];}else if(area==1)area=0;UpdateFocus();}
@@ -382,7 +438,9 @@ public sealed class QuietHome : NUIApplication
     if(r==0)r=app_control_add_extra_data(c,"__K_EX_FORCE_BOOST","enable");
     if(r==0)r=app_control_add_extra_data(c,"__K_SPLASH_SCREEN","LA_UI_VR_TRANSPARENT");
    }
-   if(r==0)r=app_control_send_launch_request(c,IntPtr.Zero,IntPtr.Zero);WriteState("launch:"+id+(menuItem==null?"":":"+menuItem)+":"+r);if(r!=0)ShowError("Could not open this screen. Try Advanced settings.");}finally{app_control_destroy(c);}
+   if(r==0)r=app_control_send_launch_request(c,IntPtr.Zero,IntPtr.Zero);
+   if(r==0&&id=="org.tizen.menu")YieldToNativeMenu();
+   WriteState("launch:"+id+(menuItem==null?"":":"+menuItem)+":"+r);if(r!=0)ShowError("Could not open this screen. Try Advanced settings.");}finally{app_control_destroy(c);}
  }
  void ShowError(string text){notice.Text=text;}
  void WriteState(string activity){try{File.WriteAllText(StateFile,DateTime.UtcNow.ToString("o")+"\npage="+page+"\nselected="+selected+"\narea="+area+"\nactivity="+activity+"\nkey="+lastKey+"\nfont_loaded="+fontLoaded+"\nstyle=free-my-tv\nbuild_ms="+buildMilliseconds+"\nlibrary_page="+libraryPage+"\nlibrary_count="+library.Count+"\nlibrary_error="+libraryError+"\nselected_name="+(selected>=0&&selected<slots.Count?slots[selected].Name:"")+"\nartwork_cached="+artworkCache.Count+"\nartwork_ready="+ArtworkReadyCount()+"\nartwork_pending="+ArtworkPending()+"\nartwork_views_created="+artworkViewsCreated+"\npage_artwork_cold="+pageArtworkCold+"\nprocess_id="+Process.GetCurrentProcess().Id+"\nediting="+editing+"\nvolume="+currentVolume+"\nmute="+currentMute+"\nbrightness="+SettingValue("brightness")+"\ngame-mode="+SettingValue("game-mode")+"\nsleeptimer="+SettingValue("sleeptimer")+"\n");}catch{}}

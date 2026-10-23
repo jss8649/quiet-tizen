@@ -124,6 +124,10 @@ The small QuickLaunch bridge exits on vendor `launch_type=preload` requests.
 For interactive requests it opens Quiet Home's settings page and exits.
 It does not keep a second heavy settings process running.
 
+An opt-in [native popup navigation workaround](05-controller.md#native-popups-ignore-remote-arrows)
+uses that same bridge only during a native Settings session. Install both
+updated assemblies before enabling it; the translation is off by default.
+
 After quick settings work, take a new snapshot and install the bridge:
 
 ```sh
