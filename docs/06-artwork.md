@@ -8,6 +8,21 @@ Hulu, Spotify, Apple TV, Tubi, Amazon Luna and Xbox. App IDs vary across regions
 releases and packages. Match IDs against the current TV's metadata, then
 test each shortcut.
 
+## Optional SponsorBlock YouTube client
+
+The example YouTube entry opens Samsung's stock YouTube app, which does not
+include SponsorBlock. To use SponsorBlock, install the separate
+[TizenTube app](https://github.com/reisxd/TizenTube) using its official
+instructions, then point the YouTube entry in `apps.local.json` to the app ID
+shown in the TV's installed-app inventory. Keep the stock YouTube entry as a
+separate shortcut if you want both clients.
+
+Quiet Home only launches the selected app; SponsorBlock segment lookup,
+skipping and any timeline markers belong to TizenTube. Configure SponsorBlock
+in TizenTube's own settings. Markers can only appear where the selected video
+has community-submitted segments and the TV can reach SponsorBlock's service.
+Quiet Tizen does not bundle TizenTube or its code.
+
 Copy `launcher/assets/apps.json` to the ignored
 `launcher/assets/apps.local.json` to customize it. Entries contain a name,
 native app ID, local asset path, fit mode, background and source dimensions.
