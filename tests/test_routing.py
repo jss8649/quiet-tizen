@@ -1,6 +1,7 @@
 import re
 import sqlite3
 import tempfile
+from contextlib import closing
 from pathlib import Path
 import unittest
 
@@ -19,7 +20,7 @@ class RoutingTests(unittest.TestCase):
             ('org.tizen.menu','XF86SysMenu','package:org.tizen.menu','original-menu','keep'),
             ('unrelated.app','Other','package:unrelated.app','unrelated','keep');
         """)
-        with sqlite3.connect(self.directory / ".app-context.db") as snapshot:
+        with closing(sqlite3.connect(self.directory / ".app-context.db")) as snapshot:
             self.conn.backup(snapshot)
 
     def tearDown(self):
@@ -27,7 +28,7 @@ class RoutingTests(unittest.TestCase):
         self.temp.cleanup()
 
     def sql(self, recipe):
-        script = (ROOT / "recipes" / recipe).read_text()
+        script = (ROOT / "recipes" / recipe).read_text(encoding="utf-8")
         sql = re.search(r"<<SQL\n(.*?)\nSQL", script, re.S).group(1)
         return sql.replace("$D", str(self.directory))
 

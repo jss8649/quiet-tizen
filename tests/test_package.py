@@ -13,7 +13,7 @@ from fetch_artwork import convert, destination
 
 class PackageTests(unittest.TestCase):
     def test_catalog_assets_exist_and_ids_are_unique(self):
-        catalog = json.loads((ROOT / "launcher/assets/apps.json").read_text())
+        catalog = json.loads((ROOT / "launcher/assets/apps.json").read_text(encoding="utf-8"))
         self.assertEqual(len({a["Id"] for a in catalog}), len(catalog))
         for entry in catalog:
             asset = entry["Asset"]
@@ -22,7 +22,7 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(sum(bool(a.get("Utility")) for a in catalog), 1)
 
     def test_profile_has_no_duplicate_app_ids_or_essential_containers(self):
-        profile = json.loads((ROOT / "profiles/un75u8000ffxza-1300.9.json").read_text())
+        profile = json.loads((ROOT / "profiles/un75u8000ffxza-1300.9.json").read_text(encoding="utf-8"))
         ids = [app for group in profile["groups"].values() for app in group["app_ids"]]
         self.assertEqual(len(ids), len(set(ids)))
         for essential in ("com.samsung.tv.bixby-promotion", "org.tizen.menu", "com.samsung.tv.quicklaunch"):
@@ -50,7 +50,7 @@ class PackageTests(unittest.TestCase):
 
     def test_relative_document_links_resolve(self):
         for doc in [ROOT / "README.md", ROOT / "NOTICE.md", *sorted((ROOT / "docs").glob("*.md"))]:
-            for link in re.findall(r"\[[^\]]*\]\(([^ )]+)(?: [^)]*)?\)", doc.read_text()):
+            for link in re.findall(r"\[[^\]]*\]\(([^ )]+)(?: [^)]*)?\)", doc.read_text(encoding="utf-8")):
                 if "://" in link or link.startswith("#"):
                     continue
                 path = link.split("#", 1)[0]

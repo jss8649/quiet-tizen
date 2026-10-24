@@ -139,10 +139,15 @@ class SdbClient:
         tv_host: str,
         *,
         timeout: float = DEFAULT_TIMEOUT,
+        max_appinstall_bytes: int = SDB_APPINSTALL_MAX_SAFE_BYTES,
     ) -> None:
+        if (type(max_appinstall_bytes) is not int
+                or not 300 <= max_appinstall_bytes <= SDB_APPINSTALL_MAX_SAFE_BYTES):
+            raise ValueError("SDB inline-command limit must be between 300 and 510 bytes")
         self.executable = executable
         self.tv_host = tv_host
         self.timeout = timeout
+        self.max_appinstall_bytes = max_appinstall_bytes
 
     @property
     def serial(self) -> str:
@@ -194,10 +199,10 @@ class SdbClient:
         injection = build_shell_injection(command)
         argument = f"{SDB_APPINSTALL_PREFIX}{injection}"
         argument_size = len(argument.encode("utf-8"))
-        if argument_size > SDB_APPINSTALL_MAX_SAFE_BYTES:
+        if argument_size > self.max_appinstall_bytes:
             raise SdbError(
                 f"SDB appinstall injection is {argument_size} bytes; maximum safe "
-                f"size is {SDB_APPINSTALL_MAX_SAFE_BYTES}. Stage the command first."
+                f"size is {self.max_appinstall_bytes}. Stage the command first."
             )
         return self.run(
             ("-s", self.serial, "shell", argument),
@@ -266,7 +271,7 @@ class SdbClient:
                 "printf '\\n[exit:%s]\\n' \"$?\" >&3;exec 3>&-"
             )
             launch_command = wrapped
-            if _injection_argument_size(wrapped) > SDB_APPINSTALL_MAX_SAFE_BYTES:
+            if _injection_argument_size(wrapped) > self.max_appinstall_bytes:
                 launch_command = self._stage_script(wrapped)
             if on_listening is not None:
                 on_listening(callback, bind, callback_port)

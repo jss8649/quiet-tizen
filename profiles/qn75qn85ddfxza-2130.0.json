@@ -1,0 +1,54 @@
+{
+  "profile_version": 1,
+  "support_status": "preview-validated",
+  "model": "QN75QN85DDFXZA",
+  "firmware": "T-PTMDAKUC-0090-2130.0",
+  "identity_evidence": "Owner About TV screen",
+  "os": "Tizen 9.0.0",
+  "kernel": "Linux 5.4.249 armv7l",
+  "runtime": "6.0.9",
+  "registry": "/opt/dbspace/.pkgmgr_parser.db",
+  "temporary_root_evidence": {
+    "checked_on": "2026-10-23",
+    "authenticated_uid_euid": [0, 0],
+    "staging_cleaned": true,
+    "passwd_and_sdb_key_hashes_unchanged": true
+  },
+  "backup_evidence": {
+    "checked_on": "2026-10-23",
+    "tv_and_private_desktop_copies": true,
+    "three_sqlite_quick_checks": "ok",
+    "archived_original_assembly_hash_matches": true
+  },
+  "groups": {},
+  "stop_markers": [],
+  "runtime_only_masks": [],
+  "preferences": [],
+  "was_cache": null,
+  "diagnostic_transport": {
+    "max_inline_bytes": 400,
+    "reason": "Conservative transport limit informed by related S90D lab observations; not a measured limit or compatibility proof for this TV."
+  },
+  "related_device_evidence": [
+    {
+      "model": "QN55S90DAFXZA",
+      "firmware": "T-PTMDAKUC-0090-2130.0",
+      "finding": "The upstream compatibility table reports a successful SDK archive-root route on this different model. This does not validate access, launcher installation, or cleanup on QN75QN85DDFXZA.",
+      "sources": [
+        "https://github.com/chris-ritsen/samsung-tv-root",
+        "https://github.com/splitcipher/couchroot/blob/main/docs/lab/devices/s90d/persistence.md"
+      ]
+    }
+  ],
+  "notes": [
+    "Model and main firmware came from the owner's About TV screen. The non-root diagnostic ran on this TV on 2026-10-23.",
+    "A temporary authenticated root check ran id with UID/EUID 0 on 2026-10-23; its staging was removed and passwd/SDB-key hashes were unchanged. Cleanup has not been tested.",
+    "On-device checks observed Tizen 9.0.0, Linux 5.4.249 armv7l, Microsoft.NETCore.App 6.0.9, and the package registry path and selected schemas. The ARM ABI remains unverified.",
+    "A read-only root inventory found 554 application-registry rows, original Home/startup selectors, two visible source IDs, and settings key routes. Targeted cleanup and visible HDMI switching remain unverified.",
+    "Four matching framework references were checksum-verified and copied privately; Quiet Home, QuickLaunch, and Probe compiled locally. The Quiet Home preview was installed and the owner confirmed it visible and navigable with the remote.",
+    "The owner confirmed PlayStation 5 picture and sound on HDMI 1, YouTube, Netflix, and Prime Video launches, and responsive Volume, Sound, Advanced, Network, and Controllers controls. Nintendo Switch on HDMI 2 is unplugged and remains unverified.",
+    "Fresh SQLite snapshots and the original Bixby Promotion package were saved on TV and checksum-verified on the desktop. Original Home/startup values were recorded. The preview and Home routing have fixed inverse scripts. Home/startup were assigned to Quiet Home and independently read back; the owner confirmed that the Home button opens Quiet Home. An initial full restart showed a black screen until Home was pressed. The owner then enabled Auto Open Last App, disabled Autorun Samsung TV Plus, and left Start with Smart Hub Home on. The next full restart and a subsequent standby/wake opened Quiet Home automatically. Cleanup remains disabled.",
+    "The original text-only app placeholders were replaced using a separate catalog snapshot saved on TV and desktop. Netflix, YouTube, and Prime Video assets were fetched locally from documented sources and installed without changing the launcher assembly or app IDs. The owner confirmed the three logos appear in the dock and Apps page. The artwork restore command is available but untested.",
+    "Diagnostic collection does not obtain root or change persistent configuration. Its SDB transport can create temporary files and directories."
+  ]
+}

@@ -48,10 +48,17 @@ tv push .local/build/Probe/Probe.dll Probe.dll
 tv exec --command '/usr/bin/dotnet /home/owner/share/tmp/sdk_tools/quiet-tizen/Probe.dll'
 ```
 
-Edit labels, source actions, `RefreshSource`, `SourceIndex` and the default
-`lastSource` in `launcher/src/Home.cs` to match the actual devices. The library
-is read from `apps.json`; verify all app IDs against the TV. See
-[app configuration](06-artwork.md). Rebuild after source changes.
+Copy `launcher/assets/home-layout.json` to the ignored
+`launcher/assets/home-layout.local.json`, then set the three feature cards,
+six dock shortcuts and `DefaultSource` to the actual input wiring. The default
+source must have a feature card or dock shortcut. Supported source actions
+are `hdmi:13` through `hdmi:15`; the TV's source probe and a visible switch
+test must establish what those actions do on this model. `page:1` opens the
+app library and `page:2` opens quick settings. A local layout replaces the
+example when `tools/build.py launcher` assembles the package.
+
+The library is read from `apps.json`; verify every app ID against the TV. See
+[app configuration](06-artwork.md). Rebuild after layout or catalog changes.
 
 ## Install without changing Home yet
 

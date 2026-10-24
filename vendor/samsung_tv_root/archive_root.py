@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import io
 import ipaddress
 import json
 import re
 import secrets
+import shlex
 import subprocess
 import tarfile
 import tempfile
@@ -15,8 +17,9 @@ from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 
 from .resources import payload_directory
-from .root_agent import RootAgentServer, generate_secret, write_secret
-from .sdb import CaptureResult, SdbClient, SdbError, find_sdb, route_callback_host
+from .root_agent import MAXIMUM_FRAME_BYTES, RootAgentServer, generate_secret, write_secret
+from .sdb import (CaptureResult, SDB_APPINSTALL_MAX_SAFE_BYTES, SdbClient, SdbError,
+                  find_sdb, route_callback_host)
 
 
 STAGING_ROOT = PurePosixPath("/home/owner/share/tmp/sdk_tools")
@@ -237,6 +240,38 @@ def _cleanup(client: SdbClient, package: str) -> bool:
     return True
 
 
+async def _read_staged_files(connection, staging, files, output_dir, timeout):
+    """Copy bounded files into this session's staging and verify private downloads."""
+    if output_dir is None:
+        raise ValueError("Private file destination is required.")
+    if len({name for name, _ in files}) != len(files):
+        raise ValueError("Duplicate private file destination.")
+    for name, source in files:
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,100}", name) or not source.startswith("/"):
+            raise ValueError("Invalid private file request.")
+        if (output_dir / name).exists():
+            raise FileExistsError(f"Preserve existing private file: {name}")
+    observations = []
+    for name, source in files:
+        staged = staging / name
+        copy = await connection.execute(
+            f"/bin/cp {shlex.quote(source)} {shlex.quote(str(staged))}", timeout)
+        if copy.exit_code or copy.timed_out:
+            raise ArchiveRootError(f"Could not stage private file {name}.")
+        downloaded = await connection.read_file(str(staged), timeout)
+        original = await connection.execute(f"sha256sum {shlex.quote(source)}", timeout)
+        digest = original.stdout.split()[0] if original.stdout.split() else ""
+        if (original.exit_code or original.timed_out or not re.fullmatch(r"[0-9a-f]{64}", digest)
+                or digest != downloaded.sha256 or hashlib.sha256(downloaded.data).hexdigest() != digest):
+            raise ArchiveRootError(f"Private file checksum mismatch for {name}.")
+        destination = output_dir / name
+        with destination.open("xb") as stream:
+            stream.write(downloaded.data)
+        destination.chmod(0o600)
+        observations.append({"name": name, "size_bytes": len(downloaded.data), "sha256": digest})
+    return observations
+
+
 async def probe(
     tv_host: str,
     *,
@@ -248,13 +283,20 @@ async def probe(
     command_timeout: float = 45.0,
     commands: tuple[str, ...] = (),
     payloads: Path | None = None,
+    max_appinstall_bytes: int = SDB_APPINSTALL_MAX_SAFE_BYTES,
+    read_files: tuple[tuple[str, str], ...] = (),
+    output_dir: Path | None = None,
+    staged_files: tuple[tuple[str, Path | bytes], ...] = (),
+    run_staged: tuple[str, ...] = (),
+    run_staged_shell: tuple[str, str] | None = None,
 ) -> dict[str, object]:
     ipaddress.IPv4Address(tv_host)
     callback = callback_host or route_callback_host(tv_host)
     ipaddress.IPv4Address(callback)
     bind = bind_host or callback
     ipaddress.IPv4Address(bind)
-    client = SdbClient(find_sdb(), tv_host, timeout=sdb_timeout)
+    client = SdbClient(find_sdb(), tv_host, timeout=sdb_timeout,
+                       max_appinstall_bytes=max_appinstall_bytes)
     assessment = await asyncio.to_thread(_check_target, client)
     payloads = payloads or payload_directory(
         "common31" if assessment.runtime == "3.1" else "common"
@@ -327,8 +369,46 @@ async def probe(
                     "smack": identity.smack_label.strip(),
                     "preflight_capabilities": assessment.capabilities,
                 }
-                if commands:
+                staged_names = set()
+                for name, local in staged_files:
+                    if (not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,100}", name)
+                            or name in staged_names):
+                        raise ValueError("Invalid staged file name.")
+                    staged_names.add(name)
+                    data = local if isinstance(local, bytes) else local.read_bytes()
+                    if len(data) > MAXIMUM_FRAME_BYTES:
+                        raise ValueError("Staged file exceeds root-agent limit.")
+                    written = await connection.write_file(
+                        str(STAGING_ROOT / package / name), data, command_timeout)
+                    if written.sha256 != hashlib.sha256(data).hexdigest():
+                        raise ArchiveRootError(f"Staged file verification failed: {name}")
+                if run_staged:
+                    if any(name not in staged_names for name in run_staged):
+                        raise ValueError("Only uploaded files may be run from staging.")
                     evidence["commands"] = []
+                    for name in run_staged:
+                        command_text = f"/usr/bin/dotnet {STAGING_ROOT / package / name}"
+                        result = await connection.execute(command_text, command_timeout)
+                        evidence["commands"].append(
+                            {"command": command_text, "exit_code": result.exit_code,
+                             "timed_out": result.timed_out, "stdout": result.stdout,
+                             "stderr": result.stderr}
+                        )
+                if run_staged_shell:
+                    name, phase = run_staged_shell
+                    if name not in staged_names or not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", phase):
+                        raise ValueError("Only an uploaded script and a simple phase name may be run.")
+                    command_text = (f"/bin/cat {shlex.quote(str(STAGING_ROOT / package / name))} "
+                                    f"| /bin/sh -s -- {shlex.quote(phase)} "
+                                    f"{shlex.quote(str(STAGING_ROOT / package))}")
+                    result = await connection.execute(command_text, command_timeout)
+                    evidence.setdefault("commands", []).append(
+                        {"command": command_text, "exit_code": result.exit_code,
+                         "timed_out": result.timed_out, "stdout": result.stdout,
+                         "stderr": result.stderr}
+                    )
+                if commands:
+                    evidence.setdefault("commands", [])
                     for command_text in commands:
                         result = await connection.execute(command_text, command_timeout)
                         evidence["commands"].append(
@@ -340,6 +420,10 @@ async def probe(
                                 "stderr": result.stderr,
                             }
                         )
+                if read_files:
+                    evidence["private_files"] = await _read_staged_files(
+                        connection, STAGING_ROOT / package, read_files,
+                        output_dir, command_timeout)
             finally:
                 await connection.shutdown()
             if launch_task is not None:

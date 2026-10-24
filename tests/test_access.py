@@ -1,10 +1,12 @@
+import asyncio
 import base64
 import gzip
 import hashlib
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import sys
+import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import AsyncMock, Mock, patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
@@ -55,6 +57,34 @@ class AccessTests(unittest.TestCase):
         ]):
             with self.assertRaises(ArchiveRootError):
                 _check_target(client)
+
+    def test_access_probe_applies_profile_transport_limit(self):
+        from samsung_tv_root.archive_root import probe
+        with patch("samsung_tv_root.archive_root.find_sdb", return_value=Path("sdb")), \
+                patch("samsung_tv_root.archive_root.SdbClient") as client, \
+                patch("samsung_tv_root.archive_root._check_target", side_effect=RuntimeError("stop")):
+            with self.assertRaisesRegex(RuntimeError, "stop"):
+                asyncio.run(probe("192.0.2.10", max_appinstall_bytes=400))
+        self.assertEqual(client.call_args.kwargs["max_appinstall_bytes"], 400)
+
+    def test_staged_framework_read_checks_source_hash_and_keeps_file_private(self):
+        from samsung_tv_root.archive_root import _read_staged_files
+        from samsung_tv_root.root_agent import RootAgentFile
+        data = b"synthetic framework reference"
+        digest = hashlib.sha256(data).hexdigest()
+        connection = Mock()
+        connection.execute = AsyncMock(side_effect=[
+            Mock(exit_code=0, timed_out=False),
+            Mock(exit_code=0, timed_out=False, stdout=f"{digest}  original"),
+        ])
+        connection.read_file = AsyncMock(return_value=RootAgentFile(1, data, digest))
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            evidence = asyncio.run(_read_staged_files(
+                connection, PurePosixPath("/stage"), (("Tizen.dll", "/system/Tizen.dll"),), output, 30))
+            self.assertEqual((output / "Tizen.dll").read_bytes(), data)
+            self.assertEqual(evidence[0]["sha256"], digest)
+            self.assertEqual(connection.read_file.call_args.args[0], "/stage/Tizen.dll")
 
 
 if __name__ == "__main__":

@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """Generate reviewed apply/restore SQL from YOUR fresh, consistent registry snapshot."""
 import argparse
+from contextlib import closing
 import json
 from pathlib import Path
 import re
 import shlex
 import sqlite3
 import os
+from device_profiles import DEFAULT_PROFILE_PATH, load_profile, require_operation
 
 ROOT = Path(__file__).resolve().parents[1]
 FIELDS = ("app_disable", "app_onboot", "app_autorestart")
@@ -30,7 +32,7 @@ def validate_id(app_id):
 
 def read_rows(database, ids):
     # Read only. A caller must use SQLite's .backup, never copy a live WAL database.
-    with sqlite3.connect(database.resolve().as_uri() + "?mode=ro", uri=True) as conn:
+    with closing(sqlite3.connect(database.resolve().as_uri() + "?mode=ro", uri=True)) as conn:
         if conn.execute("PRAGMA quick_check").fetchone() != ("ok",):
             raise ValueError("Snapshot integrity check failed.")
         rows = []
@@ -78,20 +80,24 @@ echo 'Registry transaction complete. This does not terminate already-running pro
 """
 
 
-def main():
+def main(argv=None):
     os.umask(0o077)
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--snapshot", type=Path, required=True)
     p.add_argument("--groups", nargs="+", required=True)
     p.add_argument("--output", type=Path, required=True, help="New directory below .local/")
-    p.add_argument("--profile", type=Path, default=ROOT / "profiles/un75u8000ffxza-1300.9.json")
-    args = p.parse_args()
+    p.add_argument("--profile", type=Path, default=DEFAULT_PROFILE_PATH)
+    args = p.parse_args(argv)
+    try:
+        profile = load_profile(args.profile)
+        require_operation(profile, "cleanup")
+    except ValueError as error:
+        p.error(str(error))
     out = args.output.resolve()
     if (ROOT / ".local").resolve() not in out.parents:
         p.error("Plans contain private rollback state; write them below this checkout's .local/.")
     if out.exists():
         p.error("Output directory already exists; preserve previous rollback records.")
-    profile = json.loads(args.profile.read_text())
     ids = []
     for group in args.groups:
         if group not in profile["groups"]:

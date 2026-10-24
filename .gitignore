@@ -20,3 +20,4 @@ __pycache__/
 *.tar*
 launcher/assets/app-icons/
 launcher/assets/apps.local.json
+launcher/assets/home-layout.local.json

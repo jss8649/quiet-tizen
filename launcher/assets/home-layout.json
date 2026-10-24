@@ -1,0 +1,34 @@
+{
+  "DefaultSource": 14,
+  "Cards": [
+    {
+      "Name": "PlayStation 5",
+      "Action": "hdmi:14",
+      "Description": "Game console · HDMI 2",
+      "Asset": "feature-ps5.svg",
+      "Eyebrow": "PLAYSTATION 5",
+      "Headline": "Let's play.",
+      "CallToAction": "Switch to HDMI 2"
+    },
+    {
+      "Name": "Nintendo Switch",
+      "Action": "hdmi:15",
+      "Description": "Game console · HDMI 3",
+      "Asset": "feature-switch.svg"
+    },
+    {
+      "Name": "HDMI 1",
+      "Action": "hdmi:13",
+      "Description": "External device",
+      "Asset": "feature-hdmi.svg"
+    }
+  ],
+  "Dock": [
+    {"Name": "Netflix", "Action": "app:org.tizen.netflix-app", "Asset": "netflix"},
+    {"Name": "YouTube", "Action": "app:com.samsung.tv.cobalt-yt", "Asset": "youtube"},
+    {"Name": "Prime Video", "Action": "app:org.tizen.primevideo", "Asset": "prime"},
+    {"Name": "PlayStation 5", "Action": "hdmi:14", "Asset": "ps5"},
+    {"Name": "Nintendo Switch", "Action": "hdmi:15", "Asset": "switch"},
+    {"Name": "Your Apps", "Action": "page:1", "Asset": "apps"}
+  ]
+}

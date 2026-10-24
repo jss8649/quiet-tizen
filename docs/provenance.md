@@ -23,16 +23,35 @@ firmware-key tooling and unrelated payloads are not bundled.
 `resources.py` retains upstream profile names, but this toolkit explicitly
 builds and selects only the two common .NET 6 payloads.
 
-The one local change to the copied access code is in `archive_root.py`:
-if Samsung's host returns the exact `Unknown option --list-runtimes` error,
-resolve `/usr/share/dotnet.tizen/netcoreapp`, require `libcoreclr.so` and
-`System.Private.CoreLib.dll`, then derive the runtime version from that path.
-Other preflight errors still fail. This fallback was used on the actual TV.
+Local changes to the copied access code are:
+
+- In `archive_root.py`, if Samsung's host returns the exact
+  `Unknown option --list-runtimes` error, resolve
+  `/usr/share/dotnet.tizen/netcoreapp`, require `libcoreclr.so` and
+  `System.Private.CoreLib.dll`, then derive the runtime version from that path.
+  Other preflight errors still fail. This fallback was used on the original TV.
+- In `sdb.py`, `SdbClient` accepts a per-instance `max_appinstall_bytes` from
+  300 through 510 bytes. Its default remains 510. Both inline-request validation
+  and the decision to stage a longer command use this instance value. The
+  QN85DD diagnostic profile selects 400, informed by the related
+  [S90D report](https://github.com/splitcipher/couchroot/blob/main/docs/lab/devices/s90d/persistence.md)
+  of a rejected 495-byte inline request and successful staged execution.
+  This conservative transport choice has not been measured on the QN85DD.
 
 The new `tools/tv.py` wrapper adds explicit model/declared-firmware gating,
 private local storage, bounded checksum-verified file transfer and reviewed
 single-command execution. Those generalized conveniences were locally
 tested; they are not a claim of end-to-end testing on additional hardware.
+
+The QN85DD extension began with an inventory-only profile and fixed diagnostic
+commands for runtime, capabilities, candidate files, and selected configuration
+schemas. Diagnostics run without root and can use temporary SDB script staging
+and gate directories. Their structured report retains compatibility fields
+instead of raw logs or private device/network/account identifiers. Partial
+checks remain explicit. A subsequent temporary root identity check passed on
+the QN85DD; its access-validated stage permits fixed read-only root inventory,
+framework-reference retrieval, and the source/Home Probe, while deployment
+and cleanup stay disabled. See the [QN85DD guide](10-qn85dd.md).
 
 ## Launcher and design
 

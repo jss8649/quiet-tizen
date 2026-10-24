@@ -49,6 +49,10 @@ def main():
         if local_catalog.exists():
             shutil.copyfile(local_catalog, assets / "apps.json")
         (assets / "apps.local.json").unlink(missing_ok=True)
+        local_layout = ROOT / "launcher/assets/home-layout.local.json"
+        if local_layout.exists():
+            shutil.copyfile(local_layout, assets / "home-layout.json")
+        (assets / "home-layout.local.json").unlink(missing_ok=True)
         print("Deployable files: .local/package/. Review the catalog and input mapping before use.")
 
 

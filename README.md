@@ -69,9 +69,28 @@ Root access is reacquired from the computer when maintenance requires it.
 | Netflix | More available memory after closing background apps; perceived input lag **not yet confirmed fixed** |
 
 The native launcher and underlying techniques were exercised on that TV.
-The **generalized scripts in this public release were checked locally and
-compiled where applicable; they have not been replayed end-to-end on a second
-TV**. This matters especially for private Samsung APIs and registry schemas.
+Fixed backup and preview installation stages have also run on the QN85DD;
+guarded Home routing has now run on that TV. The Home button opens Quiet Home.
+An initial full restart showed a black screen until Home was pressed; after
+turning on Auto Open Last App and turning off Autorun Samsung TV Plus, Quiet
+Home opened automatically on a full restart and after standby/wake. Settings-bridge,
+cleanup, and recovery testing are still pending. This matters especially for
+private Samsung APIs and registry schemas.
+
+**QN75QN85DDFXZA / T-PTMDAKUC-0090-2130.0:** a separate device profile and
+diagnostic report are available. Start with the [QN85DD guide](docs/10-qn85dd.md).
+The non-root preflight, temporary root identity check, read-only inventory,
+and source/Home probe passed on this TV. Matching private framework references
+were transferred and the launcher built locally. The original candidate package
+and SQLite databases were backed up on the TV and copied privately to the
+computer; the Quiet Home preview was installed and confirmed visible and
+navigable. Home/startup selectors were assigned and read back, and the owner
+confirmed the Home button opens Quiet Home. After an initial black screen on
+full restart, the owner enabled Auto Open Last App and disabled Autorun Samsung
+TV Plus. The next full restart and a subsequent standby/wake opened Quiet Home
+automatically. Local Netflix, YouTube, and Prime Video artwork was installed
+with a separate backup, and the owner confirmed all three logos are visible
+in the dock and Apps page. Arbitrary execution/transfers and cleanup remain disabled.
 
 ## Walkthrough
 
