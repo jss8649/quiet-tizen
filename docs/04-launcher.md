@@ -5,9 +5,11 @@ routing adjusted to make it act as the launcher. It does not replace the
 kernel or the whole Tizen shell. Samsung's settings, app framework and media
 stack remain available underneath.
 
-The design follows Free My TV: light background, wide feature card, two
-portrait cards, colorful tiles, rounded controls and a translucent dock.
-All UI text here is English. See [attribution](../NOTICE.md).
+The design adapts Free My TV into a dark, apps-first screen with separate
+Inputs and Settings tabs. The default background is a generic dark SVG.
+The public app catalog uses neutral text placeholders; custom app lists and
+publisher artwork stay in local configuration. All UI text here is English.
+See [attribution](../NOTICE.md).
 
 ## Obtain matching private framework references
 
@@ -32,14 +34,24 @@ python3 tools/build.py launcher --framework .local/tv-framework
 ```
 
 This builds `BixbyPromotion.dll`, `QuickLaunch.dll` and `Probe.dll`, then
-assembles `.local/package/`. Public source cards are neutral text placeholders;
+assembles `.local/package/`. Public app cards are neutral text placeholders;
 [optional publisher artwork](06-artwork.md) can be fetched before rebuilding.
 
 ## Adapt inputs and apps
 
-The original UI uses HDMI 2 as the wide PlayStation 5 card, HDMI 3 as the
-Switch card, and HDMI 1 as the third card. Source IDs 14, 15 and 13 were observed
-on the tested TV. They are example wiring, not auto-discovery.
+The launcher queries Samsung's `libsource-api.so` source-list API and builds
+cards from connected inputs, using each returned source type when switching.
+The returned device name and icon are supplied by the TV. The source-list API
+is a private platform interface, so its availability, returned fields, memory
+ownership, source switching and icon paths may vary by model and firmware. If
+the call fails, the Inputs page shows an empty state; use the native settings
+menu to select an input.
+
+An inventory on a `QN55S90FAFXZA` (Tizen/Linux 5.4.261, ARM64, .NET runtime
+6.0.9) returned Live TV (`sourceType` 0) and one connected HDMI device
+(`sourceType` 16). That validates the inventory result on that set, not the
+public install recipe or input switching. The public install recipe remains
+qualified only for the model and firmware listed in the tested-scope table.
 
 Upload and run Probe to inspect sources and the current main-operation handler:
 
@@ -48,9 +60,10 @@ tv push .local/build/Probe/Probe.dll Probe.dll
 tv exec --command '/usr/bin/dotnet /home/owner/share/tmp/sdk_tools/quiet-tizen/Probe.dll'
 ```
 
-Edit labels, source actions, `RefreshSource`, `SourceIndex` and the default
-`lastSource` in `launcher/src/Home.cs` to match the actual devices. The library
-is read from `apps.json`; verify all app IDs against the TV. See
+Check the returned source list and `sourceType` values on the target TV before
+relying on dynamic input cards. Verify that each card selects the intended
+input and that its returned icon renders correctly. The library is read from
+`apps.json`; verify all app IDs against the TV. See
 [app configuration](06-artwork.md). Rebuild after source changes.
 
 ## Install without changing Home yet
@@ -85,7 +98,7 @@ the original backup. The snapshot and backup folder is
 Verify visibly:
 
 - All pages render; the D-pad, Select and Back behave correctly.
-- HDMI cards switch the intended input, with picture and audio.
+- Connected-input cards show the intended devices and switch inputs, with picture and audio.
 - Volume/mute and applicable quick settings work.
 - Native Advanced and Network settings still open.
 - Chosen app shortcuts launch the correct installed apps.

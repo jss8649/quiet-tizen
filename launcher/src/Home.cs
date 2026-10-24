@@ -4,12 +4,21 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using Tizen.NUI;
 using Tizen.NUI.BaseComponents;
 using Tizen.Applications;
 
 public sealed class QuietHome : NUIApplication
 {
+ sealed class InputSource
+ {
+  public bool ConnectionState {get;set;}
+  public string DetectedName {get;set;}
+  public string EditName {get;set;}
+  public string IconPath {get;set;}
+  public int SourceType {get;set;}
+ }
  const string Root="/opt/usr/apps/com.samsung.tv.bixby-promotion/res/quiet-home/";
  const string StateFile="/tmp/quiet-home-state.txt";
  sealed class Slot { public View Card,Shadow,FocusRing; public TextLabel Label; public string Name,Action,Description; public int Row,X,Y,W,H; }
@@ -20,6 +29,7 @@ public sealed class QuietHome : NUIApplication
  View artworkPreloadRoot;
  int artworkViewsCreated,pageArtworkCold;
  List<LibraryApp> library=new List<LibraryApp>();
+ List<InputSource> inputSources=new List<InputSource>();
  int libraryPage;
  string libraryError="";
  TextLabel clock, notice, detail;
@@ -28,7 +38,7 @@ public sealed class QuietHome : NUIApplication
  Animation focusAnimation;
  bool fontLoaded;
  Tizen.NUI.Timer clockTimer;
- int page, selected, area=1, lastSource=14;
+ int page, selected, area=1, lastSource=0;
  string editing="";
  long buildMilliseconds;
  int currentVolume, currentMute;
@@ -38,11 +48,13 @@ public sealed class QuietHome : NUIApplication
  double brightnessMin,brightnessMax=50,brightnessStep=1;
  string lastKey="";
  long lastKeyAt;
- readonly Color ink=new Color(0.114f,0.114f,0.122f,1);
- readonly Color muted=new Color(0.431f,0.431f,0.451f,1);
+ readonly Color ink=new Color(.94f,.95f,.97f,1);
+ readonly Color muted=new Color(.60f,.63f,.69f,1);
  readonly Color white=new Color(1,1,1,1);
  readonly Color accent=new Color(0.24f,0.29f,0.72f,1);
  [DllImport("libsource-api.so")] static extern int connect_source(int sourceType);
+ [DllImport("libsource-api.so")] static extern IntPtr get_source_list();
+ [DllImport("libc.so.6")] static extern void free(IntPtr p);
  [DllImport("libvconf.so.0")] static extern int vconf_get_int(string key,out int value);
  [DllImport("libcapi-appfw-app-control.so.0")] static extern int app_control_create(out IntPtr app);
  [DllImport("libcapi-appfw-app-control.so.0")] static extern int app_control_set_app_id(IntPtr app,string id);
@@ -66,20 +78,26 @@ public sealed class QuietHome : NUIApplication
   base.OnCreate();
   try{fontLoaded=FontClient.Instance.AddCustomFontDirectory(Root+"fonts");}catch{fontLoaded=false;}
   try{library=AppLibrary.Load(Root+"apps.json");}catch(Exception ex){libraryError=ex.Message;}
-  Window.Default.BackgroundColor=new Color(0.96f,0.96f,0.97f,1);
+  Window.Default.BackgroundColor=new Color(.035f,.043f,.059f,1);
   Window.Default.Title="Quiet Home";Window.Default.KeyEvent+=OnKey;
   PreloadArtwork();
-  RefreshSource();selected=SourceIndex();BuildPage();
+  RefreshSource();selected=0;BuildPage();
   clockTimer=new Tizen.NUI.Timer(30000);
   clockTimer.Tick+=(s,e)=>{if(clock!=null)clock.Text=DateTime.Now.ToString("h:mm tt");return true;};clockTimer.Start();WriteState("created");
  }
  protected override void OnResume(){base.OnResume();clockTimer?.Start();RefreshSource();if(tabs!=null&&page==2){RefreshSettings();UpdateFocus(false);}WriteState("resumed");}
- protected override void OnAppControlReceived(AppControlReceivedEventArgs e){base.OnAppControlReceived(e);string requested; if(e.ReceivedAppControl.ExtraData.TryGet("quiet_page",out requested)&&requested=="settings")OpenSettings("settings_request");else if(requested=="apps"){page=1;area=1;selected=0;BuildPage();}else Home("home_request");}
+ protected override void OnAppControlReceived(AppControlReceivedEventArgs e){base.OnAppControlReceived(e);string requested; if(e.ReceivedAppControl.ExtraData.TryGet("quiet_page",out requested)&&requested=="settings")OpenSettings("settings_request");else if(requested=="apps"){page=0;area=1;selected=0;BuildPage();}else Home("home_request");}
  protected override void OnPause(){base.OnPause();editing="";clockTimer?.Stop();WriteState("paused");}
- void Home(string activity){clockTimer?.Start();RefreshSource();if(tabs!=null){bool unchanged=page==0&&area==1&&editing==""&&selected==SourceIndex();page=0;area=1;editing="";selected=SourceIndex();if(!unchanged)BuildPage();WriteState(activity);}}
+ void Home(string activity){clockTimer?.Start();RefreshSource();if(tabs!=null){bool unchanged=page==0&&area==1&&editing==""&&selected==0;page=0;area=1;editing="";selected=0;if(!unchanged)BuildPage();WriteState(activity);}}
  void OpenSettings(string activity){clockTimer?.Start();page=2;area=1;selected=0;editing="";BuildPage();WriteState(activity);}
- void RefreshSource(){try{int n;if(vconf_get_int("memory/system/source_type",out n)==0&&n>=13&&n<=15)lastSource=n;}catch{}}
- int SourceIndex(){return lastSource==15?1:lastSource==13?2:0;}
+ void RefreshSource(){try{int n;if(vconf_get_int("memory/system/source_type",out n)==0&&n>=0)lastSource=n;}catch{}}
+ void RefreshInputSources(){
+  IntPtr p=IntPtr.Zero;
+  try{p=get_source_list();if(p==IntPtr.Zero){inputSources=new List<InputSource>();return;}
+   string json=Marshal.PtrToStringAnsi(p);
+   inputSources=(JsonSerializer.Deserialize<List<InputSource>>(json,new JsonSerializerOptions{PropertyNameCaseInsensitive=true})??new List<InputSource>()).FindAll(s=>s.ConnectionState);
+  }catch{inputSources=new List<InputSource>();}finally{if(p!=IntPtr.Zero)free(p);}
+ }
  View Add(View v){scene.Add(v);Window.Default.Add(v);return v;}
  View Panel(int x,int y,int w,int h,Color color,int radius=18){return Add(new View{Position2D=new Position2D(x,y),Size2D=new Size2D(w,h),BackgroundColor=color,CornerRadius=new Vector4(radius,radius,radius,radius)});}
  TextLabel Text(string text,int x,int y,int w,int h,float size,Color color,string face="Medium")
@@ -93,19 +111,14 @@ public sealed class QuietHome : NUIApplication
   ParkArtwork();pageArtworkCold=0;
   foreach(var v in scene){Window.Default.Remove(v);v.Dispose();}scene.Clear();slots.Clear();
   Add(new ImageView{ResourceUrl=Root+"free-background.svg",Size2D=new Size2D(1920,1080)});
-  Text(page==0?"Home":page==1?"Your Apps":"Quick Settings",76,55,1350,100,76,ink,"Display");
-  tabs=new TextLabel[3];string[] nav={"Inputs","Apps","Settings"};int[] tx={54,221,366};int[] tw={153,131,182};
+  Text(page==0?"Apps":page==1?"Inputs":"Quick Settings",76,55,1350,100,76,ink,"Display");
+  tabs=new TextLabel[3];string[] nav={"Apps","Inputs","Settings"};int[] tx={54,221,388};int[] tw={153,153,182};
   for(int i=0;i<3;i++){tabs[i]=Text(nav[i],tx[i],158,tw[i],68,30,muted);tabs[i].HorizontalAlignment=HorizontalAlignment.Center;}
   clock=Text(DateTime.Now.ToString("h:mm tt"),1540,170,300,45,24,muted);clock.HorizontalAlignment=HorizontalAlignment.End;
   if(page==0){
-   var hero=Feature("PlayStation 5","hdmi:14","Game console · HDMI 2","feature-ps5.svg",80,262,1040,442,"hero");
-   hero.Card.Add(Label("PLAYSTATION 5",44,52,550,40,24,new Color(.86f,.91f,1,1),"Semibold"));
-   hero.Card.Add(Label("Let's play.",40,124,560,100,72,white,"Display"));
-   hero.Card.Add(Label("Switch to HDMI 2",46,246,440,48,30,new Color(.88f,.93f,1,1)));
-   Feature("Nintendo Switch","hdmi:15","Game console · HDMI 3","feature-switch.svg",1160,262,320,442,"portrait");
-   Feature("HDMI 1","hdmi:13","External device","feature-hdmi.svg",1520,262,320,442,"portrait");
-  }else if(page==1){
    BuildLibrary();
+  }else if(page==1){
+   RefreshInputSources();BuildInputs();
   }else{
    RefreshSettings();
    SettingsTile("Volume","volume","Select · Left / Right to adjust","volume",0,0);
@@ -117,22 +130,27 @@ public sealed class QuietHome : NUIApplication
    SettingsTile("Network","network","Wi-Fi and connection setup","network",2,1);
    SettingsTile("Advanced","app:org.tizen.menu","Open Samsung's full settings","settings",3,1);
   }
-  if(page==0){
-  Add(new ImageView{ResourceUrl=Root+"glass-shelf.svg",Position2D=new Position2D(0,784),Size2D=new Size2D(1920,280)});
-  Dock("Netflix","app:org.tizen.netflix-app","netflix",0);
-  Dock("YouTube","app:com.samsung.tv.cobalt-yt","youtube",1);
-  Dock("Prime Video","app:org.tizen.primevideo","prime",2);
-  Dock("PlayStation 5","hdmi:14","ps5",3);
-  Dock("Nintendo Switch","hdmi:15","switch",4);
-  Dock("Your Apps","page:1","apps",5);
-  }
-  Toolbar("Apps","page:1","apps",0);Toolbar("Inputs","page:0","hdmi",1);Toolbar("Settings","page:2","settings",2);
+  Toolbar("Apps","page:0","apps",0);Toolbar("Inputs","page:1","hdmi",1);Toolbar("Settings","page:2","settings",2);
   toolbarHint=Text("",1530,170,310,45,24,ink);toolbarHint.HorizontalAlignment=HorizontalAlignment.End;
   detail=Text("",80,1030,1320,35,20,muted);
   notice=Text("",80,1008,1760,34,22,accent);
-  var hint=Text(page==1?(AppLibrary.PageCount(library.Count)<=1?"Select to open · Back to Home":libraryPage+1<AppLibrary.PageCount(library.Count)?"Down for more apps · Back to Home":"Up for previous apps · Back to Home"):"Back to input",1310,1030,530,35,20,muted);hint.HorizontalAlignment=HorizontalAlignment.End;
+  var hint=Text(page==0?(AppLibrary.PageCount(library.Count)<=1?"Select to open":libraryPage+1<AppLibrary.PageCount(library.Count)?"Down for more apps":"Up for previous apps"):page==1?"Select an input · Back to Apps":"Back to Apps",1310,1030,530,35,20,muted);hint.HorizontalAlignment=HorizontalAlignment.End;
   selected=Math.Max(0,Math.Min(selected,slots.Count-1));UpdateFocus(false);
   buildMilliseconds=stopwatch.ElapsedMilliseconds;WriteState("page_ready");
+ }
+ void BuildInputs(){
+  if(inputSources.Count==0){Text("No connected inputs found.",82,310,1000,70,34,ink,"Semibold");return;}
+  for(int i=0;i<inputSources.Count;i++){
+   var source=inputSources[i];int col=i%3,row=i/3,x=80+col*600,y=270+row*322,w=550,h=276;
+   var shadow=Panel(x-4,y+8,w+8,h+8,new Color(0,0,0,.5f),24);
+   var card=Panel(x+w/2,y+h/2,w,h,new Color(.075f,.086f,.11f,1),22);card.PivotPoint=new Position(.5f,.5f,.5f);card.PositionUsesPivotPoint=true;
+   if(!string.IsNullOrWhiteSpace(source.IconPath))card.Add(new ImageView{ResourceUrl=source.IconPath,Position2D=new Position2D(28,36),Size2D=new Size2D(156,156),FittingMode=FittingModeType.ShrinkToFit});
+   string rawName=!string.IsNullOrWhiteSpace(source.DetectedName)?source.DetectedName:source.EditName;
+   string name=source.SourceType==0?"Live TV":string.IsNullOrWhiteSpace(rawName)?"HDMI input":Uri.UnescapeDataString(rawName);
+   card.Add(Label(name,210,65,310,62,34,ink,"Semibold"));
+   card.Add(Label(source.SourceType==0?"Broadcast channels":"Connected input",210,134,310,44,22,muted));
+   slots.Add(new Slot{Card=card,Shadow=shadow,Name=name,Action="hdmi:"+source.SourceType,Description="Open "+name,Row=row,X=x,Y=y,W=w,H=h});
+  }
  }
  void BuildLibrary()
  {
@@ -304,7 +322,7 @@ public sealed class QuietHome : NUIApplication
   try{
    if(k=="XF86Home"){Home("home_key");return;}
    if(k=="XF86SysMenu"||k=="XF86More"){OpenSettings("settings_key");return;}
-   if(page==1&&HandleLibraryKey(k))return;
+   if(page==0&&HandleLibraryKey(k))return;
    if(editing!=""){if(k=="Left"||k=="Right"){int d=k=="Left"?-1:1;if(editing=="volume")ChangeVolume(d);else ChangeBrightness(d);}else if(k=="Return"||k=="KP_Enter"||k=="XF86Back"||k=="Back"||k=="Escape"){editing="";UpdateFocus();}return;}
    if(k=="Up"){if(area==2){int col=Row(1).IndexOf(selected);area=1;selected=Row(0)[page==2?col:0];}else if(area==1)area=0;UpdateFocus();}
    else if(k=="Down"){if(area==0||area==3){area=1;selected=Row(0)[0];}else if(area==1){int col=Row(0).IndexOf(selected);area=2;selected=Row(1)[page==2?col:0];}UpdateFocus();}
@@ -337,7 +355,7 @@ public sealed class QuietHome : NUIApplication
  {
   string a=slots[selected].Action;notice.Text="";
   if(a.StartsWith("hdmi:")){SelectSource(int.Parse(a.Substring(5)));return;}
-  if(a.StartsWith("page:")){page=int.Parse(a.Substring(5));selected=page==0?SourceIndex():0;area=1;BuildPage();return;}
+  if(a.StartsWith("page:")){page=int.Parse(a.Substring(5));selected=0;area=1;BuildPage();return;}
   if(a.StartsWith("app:")){Launch(a.Substring(4));return;}
   if(a=="controllers"){Launch("org.tizen.menu","add-bluetooth-keyboard");return;}
   if(a=="network"){Launch("org.tizen.menu","networksettings");return;}

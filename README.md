@@ -4,13 +4,13 @@ A practical, agent-readable guide to making a Samsung Tizen TV quieter and
 more useful as an HDMI display.
 
 This project documents work performed on one **Samsung UN75U8000FFXZA (2025
-U8000F)**. It includes **Quiet Home**, a native launcher with a colorful,
-English-language interface, lightweight settings, local app cards and a
-shortcut to native Bluetooth controller pairing.
+U8000F)**. It includes **Quiet Home**, a native launcher with a dark,
+apps-first interface, connected-input cards, lightweight settings, local app
+cards and a shortcut to native Bluetooth controller pairing.
 
 ![Quiet Home layout illustration](docs/quiet-home-preview.svg)
 
-*Layout illustration with the public text-only app cards. Input labels are configurable.*
+*Layout illustration with neutral sample cards; the live Inputs tab uses devices reported by the TV.*
 
 It also includes targeted cleanup profiles, source-build tools and rollback
 recipes. **It is a working case study with a reusable toolkit, not a universal
@@ -67,6 +67,13 @@ Root access is reacquired from the computer when maintenance requires it.
 | Cleanup | Package flags and selected service-stop conditions checked; a subset survives restart |
 | App preloading | Vendor refreshes can restore the preference; no permanent enforcement daemon |
 | Netflix | More available memory after closing background apps; perceived input lag **not yet confirmed fixed** |
+
+Connected-input discovery was also inventoried on a Samsung `QN55S90FAFXZA`
+(Tizen/Linux 5.4.261, ARM64, .NET runtime 6.0.9). The TV's source-list API
+reported Live TV and a connected HDMI device. This is evidence for dynamic
+input discovery on that device; it does **not** qualify the public install
+profile, source switching, or behavior on other models. The S90F-specific
+installation and personal launcher customizations remain local.
 
 The native launcher and underlying techniques were exercised on that TV.
 The **generalized scripts in this public release were checked locally and
