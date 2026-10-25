@@ -7,6 +7,7 @@ import re
 import shlex
 import sqlite3
 import os
+from contextlib import closing
 
 ROOT = Path(__file__).resolve().parents[1]
 FIELDS = ("app_disable", "app_onboot", "app_autorestart")
@@ -30,7 +31,7 @@ def validate_id(app_id):
 
 def read_rows(database, ids):
     # Read only. A caller must use SQLite's .backup, never copy a live WAL database.
-    with sqlite3.connect(database.resolve().as_uri() + "?mode=ro", uri=True) as conn:
+    with closing(sqlite3.connect(database.resolve().as_uri() + "?mode=ro", uri=True)) as conn:
         if conn.execute("PRAGMA quick_check").fetchone() != ("ok",):
             raise ValueError("Snapshot integrity check failed.")
         rows = []
@@ -103,8 +104,8 @@ def main():
     out.mkdir(parents=True, mode=0o700)
     for action in ("apply", "restore"):
         sql = make_sql(rows, restore=action == "restore")
-        (out / f"{action}.sql").write_text(sql)
-        (out / f"{action}.sh").write_text(make_shell(sql))
+        (out / f"{action}.sql").write_text(sql, encoding="utf-8", newline="\n")
+        (out / f"{action}.sh").write_text(make_shell(sql), encoding="utf-8", newline="\n")
     manifest = {"model": profile["model"], "firmware": profile["firmware"], "groups": args.groups,
                 "apps": [{"app_id": app, **dict(zip(FIELDS, vals))} for app, vals in rows]}
     (out / "before.json").write_text(json.dumps(manifest, indent=2) + "\n")

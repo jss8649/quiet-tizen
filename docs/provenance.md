@@ -23,11 +23,17 @@ firmware-key tooling and unrelated payloads are not bundled.
 `resources.py` retains upstream profile names, but this toolkit explicitly
 builds and selects only the two common .NET 6 payloads.
 
-The one local change to the copied access code is in `archive_root.py`:
+The runtime-discovery change to the copied access code is in `archive_root.py`:
 if Samsung's host returns the exact `Unknown option --list-runtimes` error,
 resolve `/usr/share/dotnet.tizen/netcoreapp`, require `libcoreclr.so` and
 `System.Private.CoreLib.dll`, then derive the runtime version from that path.
 Other preflight errors still fail. This fallback was used on the actual TV.
+
+Windows portability changes explicitly write LF line endings for the temporary
+archive payload's `passwd` file and the SDB capture shell script. These files
+are consumed on Linux even when generated on Windows. Offline tests inspect
+their bytes without connecting to a TV; the original upstream attribution
+and license remain unchanged.
 
 The new `tools/tv.py` wrapper adds explicit model/declared-firmware gating,
 private local storage, bounded checksum-verified file transfer and reviewed

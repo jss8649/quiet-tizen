@@ -50,7 +50,7 @@ class PackageTests(unittest.TestCase):
 
     def test_relative_document_links_resolve(self):
         for doc in [ROOT / "README.md", ROOT / "NOTICE.md", *sorted((ROOT / "docs").glob("*.md"))]:
-            for link in re.findall(r"\[[^\]]*\]\(([^ )]+)(?: [^)]*)?\)", doc.read_text()):
+            for link in re.findall(r"\[[^\]]*\]\(([^ )]+)(?: [^)]*)?\)", doc.read_text(encoding="utf-8")):
                 if "://" in link or link.startswith("#"):
                     continue
                 path = link.split("#", 1)[0]

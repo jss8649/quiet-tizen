@@ -154,7 +154,7 @@ def _prepare_artifacts(
     )
     _openssl("pkey", "-in", str(private_key), "-pubout", "-out", str(public_key))
     (directory / "passwd").write_text(
-        "owner:x:0:0:owner:/home/owner:/bin/sh\n", encoding="ascii"
+        "owner:x:0:0:owner:/home/owner:/bin/sh\n", encoding="ascii", newline="\n"
     )
     runtime_version = "3.1.0" if runtime == "3.1" else "6.0.0"
     runtime_config = {

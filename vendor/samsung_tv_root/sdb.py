@@ -350,6 +350,7 @@ class SdbClient:
             local_path.write_text(
                 f"/bin/rm -f {remote_path}\n{command}\n",
                 encoding="utf-8",
+                newline="\n",
             )
             self.push(local_path, remote_path)
         return f". {remote_path}"

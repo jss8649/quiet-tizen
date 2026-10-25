@@ -3,6 +3,7 @@ import sqlite3
 import tempfile
 from pathlib import Path
 import unittest
+from contextlib import closing
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -19,7 +20,7 @@ class RoutingTests(unittest.TestCase):
             ('org.tizen.menu','XF86SysMenu','package:org.tizen.menu','original-menu','keep'),
             ('unrelated.app','Other','package:unrelated.app','unrelated','keep');
         """)
-        with sqlite3.connect(self.directory / ".app-context.db") as snapshot:
+        with closing(sqlite3.connect(self.directory / ".app-context.db")) as snapshot:
             self.conn.backup(snapshot)
 
     def tearDown(self):
