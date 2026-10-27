@@ -22,7 +22,7 @@ The [profile](../profiles/un75u8000ffxza-1300.9.json) splits the observed target
 | `context` | Disable AI/context suggestions and content-grab helpers | Related smart features stop working |
 | `smart-extras` | Reduce SmartThings, health, gaming-hub and ambience helpers | Some integrations become unavailable |
 | `light-shell` | Disable native sidebar and browser | Requires a working Quiet Home/settings bridge first |
-| `tv-plus` | Disable Samsung TV Plus startup/app | TV Plus is unavailable until restored |
+| `tv-plus` | Disable Samsung TV Plus startup/app | TV Plus is unavailable until restored; a remote TV Plus button can then hang the TV for about 30 s ([remote buttons](10-remote-buttons.md)) |
 
 The first four groups total 51 app IDs from the original cleanup. The
 sidebar/browser add two; the later TV Plus change adds one. This is not a
