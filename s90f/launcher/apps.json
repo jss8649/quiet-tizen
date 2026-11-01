@@ -1,0 +1,52 @@
+[
+  {
+    "Name": "Jellyfin",
+    "Id": "rTn6ClEurC.Jellyfin",
+    "Asset": "app-icons/jellyfin.png",
+    "Description": "Personal media library",
+    "Fit": "contain",
+    "Background": "#171B22",
+    "Width": 512,
+    "Height": 512
+  },
+  {
+    "Name": "YouTube",
+    "Id": "9Ur5IzDKqV.TizenYouTube",
+    "Asset": "app-icons/youtube.png",
+    "Description": "Videos",
+    "Fit": "contain",
+    "Background": "#171B22",
+    "Width": 3764,
+    "Height": 814
+  },
+  {
+    "Name": "RetroArch",
+    "Id": "RtArchTzn0.RetroArch",
+    "Asset": "app-icons/retroarch.png",
+    "Description": "Retro games",
+    "Fit": "contain",
+    "Background": "#171B22",
+    "Width": 512,
+    "Height": 512
+  },
+  {
+    "Name": "Spotify",
+    "Id": "rJeHak5zRg.Spotify",
+    "Asset": "app-icons/spotify.png",
+    "Description": "Music & podcasts",
+    "Fit": "contain",
+    "Background": "#171B22",
+    "Width": 512,
+    "Height": 512
+  },
+  {
+    "Name": "Netflix",
+    "Id": "org.tizen.netflix-app",
+    "Asset": "app-icons/netflix.png",
+    "Description": "Movies & series",
+    "Fit": "contain",
+    "Background": "#171B22",
+    "Width": 512,
+    "Height": 512
+  }
+]

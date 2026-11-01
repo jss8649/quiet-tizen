@@ -1,0 +1,35 @@
+{
+  "scope": "Sanitized summary of one owner-authorized temporary root session",
+  "date": "2026-10-24",
+  "device": {
+    "model": "QN55S90FAFXZA",
+    "firmware": "T-RSMFAKUC-0090-1301.0",
+    "kernel": "Linux 5.4.261",
+    "architecture": "aarch64",
+    "dotnet_runtime": "6.0.9"
+  },
+  "method": {
+    "route": "SDB package-installer foothold with Samsung archive launcher",
+    "runtime_discovery": "The device dotnet host rejects --list-runtimes; resolving /usr/share/dotnet.tizen/netcoreapp identifies the installed runtime.",
+    "required_runtime_files_found": true,
+    "required_file_capabilities_found": true
+  },
+  "verified": {
+    "temporary_agent_authenticated_uid": 0,
+    "temporary_agent_authenticated_euid": 0,
+    "smack_context": "User",
+    "read_only_root_probe_succeeded": true,
+    "system_file_hashes_unchanged": true,
+    "temporary_staging_cleaned": true,
+    "temporary_firewall_rules_removed": true
+  },
+  "not_verified": [
+    "Persistence across full reboot or standby/wake",
+    "A general-purpose S90F install or cleanup profile",
+    "Restoration of a persistent root modification; this session made none"
+  ],
+  "limitations": [
+    "This confirms a temporary root foothold only for the reported model and firmware.",
+    "It does not establish secure-boot bypass, a permanent root service, or compatibility with other S90F firmware."
+  ]
+}

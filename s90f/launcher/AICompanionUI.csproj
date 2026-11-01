@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>AICompanionUI</AssemblyName>
+    <UseAppHost>false</UseAppHost>
+    <DebugType>none</DebugType>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TV_FRAMEWORK_DIR Condition="'$(TV_FRAMEWORK_DIR)' == ''">$(MSBuildThisFileDirectory)../../.local/tv-framework</TV_FRAMEWORK_DIR>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Tizen.NUI">
+      <HintPath>$(TV_FRAMEWORK_DIR)/Tizen.NUI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Tizen.Applications.Common">
+      <HintPath>$(TV_FRAMEWORK_DIR)/Tizen.Applications.Common.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Tizen.System">
+      <HintPath>$(TV_FRAMEWORK_DIR)/Tizen.System.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Tizen">
+      <HintPath>$(TV_FRAMEWORK_DIR)/Tizen.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+</Project>

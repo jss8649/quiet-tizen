@@ -1,0 +1,27 @@
+#!/bin/bash
+set -uo pipefail
+D=/opt/usr/share/quiet-smack-boot
+LOG=$D/runs.log
+{
+  echo "=== $(date -u +%FT%TZ) boot=$(cat /proc/sys/kernel/random/boot_id) ==="
+  BUILD=$(grep '^BUILD_ID=' /etc/os-release | cut -d= -f2-)
+  if [ "$BUILD" != "T-RSMFAKUC-0090-REL-202607141953" ]; then echo "firmware changed: $BUILD"; exit 0; fi
+  if [ "$(sha256sum /usr/lib/systemd/system/AT-HUB.service | cut -d' ' -f1)" != "b6829f0f7e95464178f92922e5fdca83bf0874df2e1bbb77d68db6892a5490b3" ]; then echo "AT-HUB unit changed"; exit 0; fi
+  if [ "$(sha256sum "$D/original" | cut -d' ' -f1)" != "c6369e7dec69408e176daa252d436acf6f8e265f560504d8bd831c8023c71d61" ]; then echo "original changed"; exit 0; fi
+  cat "$D/original" | /bin/bash
+  echo "original_rc=$?"
+  /usr/bin/gdbus call --system --dest net.connman --object-path / --method net.connman.Clock.SetProperty Timeservers "<['pool.ntp.org', 'time.google.com']>" >/dev/null 2>&1 || true
+  # Quiet memory trim: these units have no stop-file condition, so the mask
+  # has to be reapplied every boot.
+  systemctl mask --runtime --now contents-recognition-service.service org.tizen.tv.sp-kpi.service data-service.service ipa.service 2>&1 | sed 's/^/mask: /'
+  echo "=== done ==="
+} >> "$LOG" 2>&1
+# Quiet remote key proxy
+if ! systemctl is-active --quiet quiet-remote-proxy.service; then
+  systemd-run --unit=quiet-remote-proxy --property=Type=simple --property=Restart=always /bin/sh -c 'exec /usr/bin/dotnet /opt/usr/share/quiet-smack-boot/remote-proxy/remote-proxy.dll >> /opt/usr/share/quiet-smack-boot/remote-proxy.log 2>&1'
+fi
+# Quiet Home early activation
+if ! systemctl is-active --quiet quiet-home-activate.service; then
+  systemd-run --unit=quiet-home-activate --property=Type=oneshot /bin/bash -c 'for i in 1 2 3 4 5 6 7 8 9 10; do sleep 2; /usr/bin/app_launcher -u 5001 -s com.samsung.tv.AICompanionUI >> /opt/usr/share/quiet-smack-boot/activate.log 2>&1; if [ -f /tmp/quiet-home-state.txt ]; then sleep 1; /usr/bin/app_launcher -u 5001 -s com.samsung.tv.AICompanionUI >> /opt/usr/share/quiet-smack-boot/activate.log 2>&1; echo "activated at try $i" >> /opt/usr/share/quiet-smack-boot/activate.log; break; fi; done'
+fi
+exit 0

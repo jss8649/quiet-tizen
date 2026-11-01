@@ -5,7 +5,9 @@
 Read README.md and docs/01-inventory.md through docs/04-launcher.md, plus
 docs/09-recovery.md. This is a case study for one exact model/firmware, with
 newly generalized tools. Do not turn the profile into an indiscriminate
-Samsung-wide debloat list.
+Samsung-wide debloat list. For the live `QN55S90FAFXZA` setup, also read
+`s90f/AGENTS.md`; it is the handoff for the installed launcher, boot hook,
+remote key rebinds and recovery.
 
 Work only on the TV the owner identifies. Use its explicit IP address; do not
 scan the whole network or reuse another person's saved device identity.
@@ -72,7 +74,10 @@ session; allow its cleanup checks to complete first.
 Use `.local/` for device-specific plans, raw command output, screenshots,
 snapshots, builds and extracted framework assemblies. Use the ignored
 `launcher/assets/app-icons/` and `apps.local.json` for downloaded publisher art
-and customized catalogs. These paths are not for public commits.
+and customized catalogs. These paths are not for public commits. The `s90f/`
+folder is deliberately sanitized for the public fork: source, configuration,
+boot payloads and tools only. Keep local media, publisher icons, weather
+coordinates, framework assemblies, logs and snapshots in `.local/`.
 
 Before any public commit, inspect tracked files for credentials, network
 addresses, device/account identifiers, personal filesystem paths, screenshots,

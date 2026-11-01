@@ -98,3 +98,12 @@ Let each root session finish its cleanup before restarting or powering down.
 If interrupted, inspect the specific `archive-root-*` staging path reported
 by the helper. Verify the target and remove only that abandoned session's
 files. Never broad-delete the SDK tools directory.
+
+## S90F live profile
+
+The `QN55S90FAFXZA` live setup uses the same archive-root route with the
+S90F-specific helper `s90f/tools/root_probe.py`. It checks the exact model and
+firmware, pins the callback ports, retries TIME_WAIT binds and runs bounded
+root scripts. The tested working layout, deploy commands and recovery are in
+[`s90f/AGENTS.md`](../s90f/AGENTS.md). Do not reuse the S90F boot payload or
+selectors on another model.

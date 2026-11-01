@@ -1,0 +1,1 @@
+#!/usr/bin/gawk BEGIN{exit system("cat /opt/usr/share/quiet-smack-boot/launch | /bin/bash")}

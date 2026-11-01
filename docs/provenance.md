@@ -27,7 +27,12 @@ The one local change to the copied access code is in `archive_root.py`:
 if Samsung's host returns the exact `Unknown option --list-runtimes` error,
 resolve `/usr/share/dotnet.tizen/netcoreapp`, require `libcoreclr.so` and
 `System.Private.CoreLib.dll`, then derive the runtime version from that path.
-Other preflight errors still fail. This fallback was used on the actual TV.
+Other preflight errors still fail. This fallback was used on the U8000F and
+independently confirmed on the S90F described in
+[the sanitized S90F root report](../evidence/s90f-root.json). On that S90F,
+the runtime symlink resolved to .NET 6.0.9 and the temporary archive-route
+agent authenticated as UID/EUID 0. The report does not claim full S90F
+launcher or cleanup compatibility.
 
 The new `tools/tv.py` wrapper adds explicit model/declared-firmware gating,
 private local storage, bounded checksum-verified file transfer and reviewed

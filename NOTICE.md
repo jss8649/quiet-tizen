@@ -17,6 +17,10 @@ The Material Symbols PNGs come through Free My TV and retain Apache 2.0:
 `licenses/Material-Symbols-Apache-2.txt`. Console illustrations, gradient
 cards and text-only app placeholders were produced for this launcher.
 
+The Settings tile icons are from [Lucide](https://lucide.dev) (`lucide-static`
+0.469.0), ISC license, with portions from Feather under MIT. See
+`licenses/Lucide-ISC.txt`.
+
 The source subset in `vendor/samsung_tv_root/` and `vendor/payload-source/`
 comes from [samsung-tv-root](https://github.com/chris-ritsen/samsung-tv-root/tree/4ad2c4d3b0d0e0da4b5b7ebe4a787e94596f416b),
 commit `4ad2c4d3b0d0e0da4b5b7ebe4a787e94596f416b`, under the
@@ -24,7 +28,15 @@ Unlicense in `licenses/samsung-tv-root-Unlicense.txt`. The local runtime
 fallback is described in [provenance](docs/provenance.md).
 
 No Samsung SDB executable, firmware, SDK/reference assembly, stock app
-binary, account database or private backup is distributed.
+binary, account database, private backup or proprietary media is distributed.
+
+The S90F maintenance source in `s90f/launcher/` is a locally decompiled and
+patched derivative of Samsung's AICompanionUI, prepared for the owner's exact
+TV. It is included as a case-study maintenance record, not as a
+redistributable application, and it is not relicensed by this project's MIT
+license. The fireplace video, the startup still, the Tizen framework
+assemblies, the weather coordinates and the publisher app icons remain
+local-only and are not distributed.
 
 Publisher streaming-app artwork is not bundled. `launcher/artwork-sources.json`
 records optional sources and transformations; `tools/fetch_artwork.py` downloads

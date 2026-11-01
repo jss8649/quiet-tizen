@@ -1,0 +1,67 @@
+{
+  "profile": "s90f-live-quiet-home",
+  "recorded": "2026-10-27",
+  "device": {
+    "model": "QN55S90FAFXZA",
+    "model_year": "2025",
+    "firmware": "T-RSMFAKUC-0090-1301.0",
+    "build": "T-RSMFAKUC-0090-REL-202607141953",
+    "tizen": "9.0.0",
+    "kernel": "5.4.261",
+    "userspace": "32-bit ARM"
+  },
+  "verified": {
+    "root_route": "owner-authorized temporary archive-root session; no firmware, passwd or SDB key changes",
+    "full_unplug": true,
+    "boot_hook_reapplied_smack_rules": true,
+    "remote_proxy_grabbed_inputs": true,
+    "activation_log": "activated at try 1",
+    "onresume_after_oncreate_seconds": 1,
+    "menu_after_logo_seconds": "11 to 12",
+    "standby_wake": "immediate",
+    "physical_buttons": {
+      "prime": "Spotify",
+      "youtube": "TizenTube",
+      "tv_plus": "Jellyfin",
+      "netflix": "Netflix"
+    }
+  },
+  "selectors": {
+    "db/appfw/home_appid": "com.samsung.tv.AICompanionUI",
+    "db/appfw/cp_key_appid1": "3201907018807",
+    "db/appfw/cp_key_appid2": "3201606009684",
+    "db/appfw/cp_key_appid3": "111299001912"
+  },
+  "launcher": {
+    "app_id": "com.samsung.tv.AICompanionUI",
+    "installed_dll_sha256": "715edef76d5915194019375ab5f700353a828a7b2de10e6d421a778cbbbbdac3",
+    "source_rebuild_matches_installed": true,
+    "source_sha256": "27ea23736c9373dc2977f4269256b81999fa104a98b1437621c3b62eef7c29af",
+    "live_deploy_tar_sha256": "0b00e7cd8da9b615ab85380ec43a733be43bd1c232356e6a59c67b62c5ac702b",
+    "live_deploy_tar_bytes": 23844077
+  },
+  "boot_payload": {
+    "repo_launch_sha256": "0600c02145557b54836c3212299027dea1ac9ddce696fd27eae49bb244942826",
+    "wrapper_sha256": "212130e16efda58a8b46f74e108e205a540a30a124f43a8fe55ee3a14171665e",
+    "restore_sha256": "f0f4926de925ff98ae06ae78bd967291f64bbf3740c5a2390b69d851a608db66",
+    "note": "The launch is the live content reconstructed from the TV. The on-TV SHA256SUMS predates the proxy and activation blocks."
+  },
+  "local_only_assets": {
+    "fireplace.mp4": {
+      "bytes": 23626429,
+      "sha256": "fcc7c23c792557262748abe6b3d424a5ef720e6f671460bfa4678ea310567574"
+    },
+    "home-background.jpg": {
+      "bytes": 207895,
+      "sha256": "2c22ac800535a298c36bd0ed207b24d1a92194264413e10aa6f8685bdcd6c80a"
+    }
+  },
+  "limitations": [
+    "No decrypted traffic audit of this TV was performed.",
+    "The launcher source is a decompiled and patched local build, not a redistributable app.",
+    "The always-on remote proxy was approved by the owner and only handles local input and local app launches.",
+    "The boot payload was installed incrementally; the files in this folder were not replayed as an installer.",
+    "The stock Home app ID was not recorded in this sanitized folder; read it from the owner's snapshot before reverting selectors.",
+    "Publisher app icons, weather coordinates, logs, session JSON, database snapshots and Tizen framework assemblies are not in this folder."
+  ]
+}

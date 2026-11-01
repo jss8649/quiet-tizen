@@ -92,3 +92,33 @@ If root no longer works after an update, do not attempt another model's
 kernel exploit or flash an unverified image. Re-establish the exact model/
 firmware/capability evidence and use an appropriate recovery method for it.
 This project does not provide a hardware-level unbrick procedure.
+
+## S90F live setup
+
+The S90F boot payload, proxy and activation units are separate from the
+U8000F Bixby Promotion launcher. To return the boot path to stock:
+
+```sh
+systemctl stop quiet-remote-proxy.service
+systemctl stop quiet-home-activate.service
+/opt/usr/share/quiet-smack-boot/restore.sh
+```
+
+`restore.sh` restores the preserved original parseinfo with its owner, mode
+and label, then removes the payload directory. It does not change the
+installed launcher, Home selector or CP key slots.
+
+The S90F launcher keeps its previous DLL and any replaced resources under
+`/opt/usr/share/quiet-tizen-backups/<deploy-name>/`. Restore
+`AICompanionUI.dll.before` and the `orig/` files, set owner `201:0`, mode
+`755`, the app's SMACK label, then relaunch. The deploy helper performs the
+same rollback automatically on failure.
+
+Do not replace the live package registry with an old database. The S90F
+registry recovery used a `.backup` snapshot and a field-level merge after a
+direct `sqlite3` read truncated the live file. Zero the
+`.pkgmgr_parser.db-journal` header before and after any write. The merge and
+pre-merge snapshots are under `/opt/usr/share/quiet-tizen-backups/smack-persist/`.
+
+Full details and the current verified selector values are in
+[`s90f/AGENTS.md`](../s90f/AGENTS.md).

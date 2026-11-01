@@ -167,3 +167,26 @@ There is no always-running controller-poll loop. The 180 ms repeat filter
 applies inside Quiet Home only; changing it cannot fix input lag inside Netflix.
 Local diagnostic files retain only current launcher state and are overwritten;
 the launcher has no telemetry/network client.
+
+## S90F variant: AICompanionUI replacement
+
+The live `QN55S90FAFXZA` uses a separate profile. It does not replace Bixby
+Promotion. It replaces the assembly of Samsung's Home companion app,
+`com.samsung.tv.AICompanionUI`, with a decompiled and patched local build.
+
+- Source, portable project and build script:
+  [`s90f/launcher/`](../s90f/launcher/).
+- Build against the TV's own four Tizen reference assemblies in
+  `.local/tv-framework/`; they are not committed.
+- Deploy with `s90f/tools/root_probe.py --update-launcher-dll NAME`. The
+  helper's tested layout and the installed-hash rule are in
+  [`s90f/AGENTS.md`](../s90f/AGENTS.md).
+- The S90F launcher updates the clock every second from the system time. It
+  shows cached weather immediately and refreshes it on a worker thread.
+- Its startup ordering is intentionally different from the generalized
+  launcher: see the startup section of the S90F handoff before editing it.
+
+The public S90F folder contains source, configuration and sanitized evidence
+only. The fireplace video, startup still, publisher icons, weather
+coordinates, framework assemblies, logs and backups stay in ignored local
+paths.
