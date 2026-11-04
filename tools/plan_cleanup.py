@@ -56,6 +56,8 @@ def make_sql(rows, restore=False):
         expected = DISABLED if restore else original
         conditions = " AND ".join(f"{key} IS {literal(val)}" for key, val in zip(FIELDS, expected))
         lines.append(f"INSERT INTO quiet_guard SELECT count(*)=1 FROM package_app_info "
+                     f"WHERE app_id={validate_id(app_id)};")
+        lines.append(f"INSERT INTO quiet_guard SELECT count(*)=1 FROM package_app_info "
                      f"WHERE app_id={validate_id(app_id)} AND {conditions};")
     for app_id, original in rows:
         values = original if restore else DISABLED

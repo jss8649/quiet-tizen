@@ -69,6 +69,23 @@ class CleanupTests(unittest.TestCase):
         self.conn.rollback()
         self.assertEqual(self.conn.execute("SELECT app_disable FROM package_app_info").fetchone(), ("false",))
 
+    def test_apply_and_restore_refuse_new_duplicate_with_different_flags(self):
+        for restore in (False, True):
+            with self.subTest(restore=restore):
+                if restore:
+                    self.conn.executescript(make_sql(self.rows))
+                self.conn.execute("INSERT INTO package_app_info VALUES "
+                                  "('example.optional','false','false','true','new duplicate')")
+                self.conn.commit()
+                before = self.conn.execute("SELECT * FROM package_app_info ORDER BY rowid").fetchall()
+                with self.assertRaises(sqlite3.IntegrityError):
+                    self.conn.executescript(make_sql(self.rows, restore=restore))
+                self.conn.rollback()
+                self.assertEqual(self.conn.execute("SELECT * FROM package_app_info ORDER BY rowid").fetchall(),
+                                 before)
+                self.conn.execute("DELETE FROM package_app_info WHERE unrelated='new duplicate'")
+                self.conn.commit()
+
     def test_missing_and_duplicate_rows_fail(self):
         with self.assertRaises(ValueError):
             read_rows(self.path, ["missing.app"])
