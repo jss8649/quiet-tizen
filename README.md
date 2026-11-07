@@ -1,7 +1,4 @@
-# Quiet Tizen
-
-A practical, agent-readable guide to making a Samsung Tizen TV quieter and
-more useful as an HDMI display.
+![Quiet Tizen - A practical, agent-readable guide to making a Samsung Tizen TV quieter and more useful](https://capsule-render.vercel.app/api?type=blur&height=300&color=gradient&section=header&reversal=false&text=Quiet+Tizen&textBg=false&fontSize=70&fontAlign=50&fontAlignY=50&rotate=0&strokeWidth=0&desc=A+practical%2C+agent-readable+guide+to+making+a+Samsung+Tizen+TV+quieter+and+more+useful.&descSize=20&descAlign=50&descAlignY=70)
 
 This project documents work performed on one **Samsung UN75U8000FFXZA (2025
 U8000F)**. It includes **Quiet Home**, a native launcher with a colorful,
