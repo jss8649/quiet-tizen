@@ -35,6 +35,45 @@ This builds `BixbyPromotion.dll`, `QuickLaunch.dll` and `Probe.dll`, then
 assembles `.local/package/`. Public source cards are neutral text placeholders;
 [optional publisher artwork](06-artwork.md) can be fetched before rebuilding.
 
+### Building without the TV's own assemblies (public TizenFX references)
+
+When the four runtime assemblies cannot yet be pulled from the target — for
+example before temporary root is available — the launcher can still be compiled
+against the matching public [TizenFX](https://github.com/Samsung/TizenFX)
+reference assemblies from NuGet. The shipped project files reference them with
+`Private=false`, so reference-only assemblies are sufficient.
+
+Two gotchas matter here:
+
+- Samsung's marketed **TV platform version is not the TizenFX API level**. A TV
+  that reports platform `9.0` does **not** correspond to the `Tizen.NET.API9`
+  package (which predates it). Pick the API level, not the platform number.
+- The symbols `Home.cs` uses — for example `SamplingModeType.BoxThenLanczos`,
+  `ImageView.SamplingMode` and `Window.Default` — require **API level 12 or
+  later**. Earlier reference packages fail to compile.
+
+```sh
+# Extract the four references from the public API-level-12 package.
+pkg=tizen.net.api12; ver=12.0.0.18510
+curl -fsSL -o "$pkg.$ver.nupkg" \
+  "https://api.nuget.org/v3-flatcontainer/$pkg/$ver/$pkg.$ver.nupkg"
+mkdir -p .local/tv-framework pkg-tmp && (cd pkg-tmp && unzip -q "../$pkg.$ver.nupkg")
+for n in Tizen.NUI Tizen.Applications.Common Tizen.System Tizen; do
+  cp "$(find pkg-tmp -path '*/ref/*' -name "$n.dll" | head -1)" ".local/tv-framework/$n.dll"
+done
+python3 tools/build.py launcher --framework .local/tv-framework
+```
+
+This is suitable for development and review only. It does **not** replace
+matching against the target's own assemblies before an install that will run on
+the TV: a reference package newer than the device runtime can compile symbols
+the device does not provide. Confirm the device's actual TizenFX version before
+relying on an API beyond the tested build.
+
+**Hardware-test status:** build-only. Verified to compile with the .NET 6 SDK on
+macOS (arm64, under Rosetta) against `Tizen.NET.API12`; not installed or run on a
+TV.
+
 ## Adapt inputs and apps
 
 The original UI uses HDMI 2 as the wide PlayStation 5 card, HDMI 3 as the
