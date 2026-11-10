@@ -152,7 +152,49 @@
       "group": "tv-plus"
     }
   ],
-  "runtime_only_masks": [],
-  "preferences": [],
-  "was_cache": []
+  "runtime_only_masks": [
+    "ipa.service",
+    "contents-recognition-service.service",
+    "org.tizen.tv.sp-kpi.service",
+    "data-service.service"
+  ],
+  "preferences": [
+    {
+      "key": "db/was/preload_by_country",
+      "type": "string",
+      "value": "false"
+    },
+    {
+      "key": "db/menu/autorun_tv_plus",
+      "type": "bool",
+      "value": "0"
+    },
+    {
+      "key": "db/menu/voice/voice_activated",
+      "type": "bool",
+      "value": "0"
+    },
+    {
+      "key": "db/menu/voice/wakeupless_status",
+      "type": "int",
+      "value": "0"
+    },
+    {
+      "key": "db/si_service/voice_recog_enable",
+      "type": "bool",
+      "value": "0"
+    },
+    {
+      "key": "db/multi-assistant/prelaunch_mode",
+      "type": "bool",
+      "value": "0"
+    }
+  ],
+  "was_cache": {
+    "table": "WASConfigTable",
+    "row": "RESERVED_18",
+    "json_path": "$.rsp.preloadByCountry",
+    "after": "false"
+  },
+  "cleanup_applied": "2026-11-10: 5 groups (50 app records), 12 stop markers, 4 runtime masks, 6 preferences, WAS cache row. light-shell deferred until launcher."
 }
