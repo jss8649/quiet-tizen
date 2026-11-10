@@ -147,7 +147,7 @@ def main():
         if len(script) > 45000:
             raise ValueError("Script too large for the bounded command channel; split into phases.")
         encoded = base64.b64encode(script).decode()
-        command = f"printf '%s' {shlex.quote(encoded)} | /bin/sh -s -- " + shlex.join(args.arg)
+        command = f"printf '%s' {shlex.quote(encoded)} | base64 -d | /bin/sh -s -- " + shlex.join(args.arg)
     else:
         if args.arg:
             raise ValueError("--arg requires --script.")
