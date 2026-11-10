@@ -19,7 +19,8 @@ sys.path.insert(0, str(ROOT / "vendor"))
 from samsung_tv_root.archive_root import probe, _check_target, _capture
 from samsung_tv_root.sdb import SdbClient, find_sdb
 
-PROFILE = json.loads((ROOT / "profiles/un75u8000ffxza-1300.9.json").read_text())
+profile_rel = os.environ.get("QTV_PROFILE", "profiles/un75u8000ffxza-1300.9.json")
+PROFILE = json.loads((ROOT / profile_rel).read_text())
 STAGE = "/home/owner/share/tmp/sdk_tools/quiet-tizen"
 
 

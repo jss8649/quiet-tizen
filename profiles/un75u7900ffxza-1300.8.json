@@ -1,0 +1,11 @@
+{
+  "profile_version": 1,
+  "model": "UN75U7900FFXZA",
+  "firmware": "T-X22UDFAKUC-0090-1300.8",
+  "os": "unknown — pending inventory",
+  "kernel": "unknown — pending inventory",
+  "runtime": "unknown — pending inventory",
+  "registry": "/opt/dbspace/.pkgmgr_parser.db",
+  "groups": {},
+  "notes": "Skeleton profile created from the owner's on-screen model/firmware. Groups stay EMPTY until populated from this TV's own inventory. No tested cleanup applies to this model yet."
+}
