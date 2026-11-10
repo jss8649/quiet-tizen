@@ -18,7 +18,11 @@ SDB_PORT = 26101
 DEFAULT_TIMEOUT = 10.0
 DEFAULT_CAPTURE_TIMEOUT = 30.0
 SDB_APPINSTALL_PREFIX = "0 appinstall tpk "
-SDB_APPINSTALL_MAX_SAFE_BYTES = 510
+SDB_APPINSTALL_MAX_SAFE_BYTES = 448
+# UN75U7900FFXZA / T-X22UDFAKUC-0090-1300.8: TV-side sdbd drops appinstall
+# shell injections larger than ~480 bytes (471 verified OK, 491 silently
+# dropped, no callback). Keep long payloads on the staged-script path, which
+# is verified working on this firmware.
 SHELL_INJECTION_DELAY_SECONDS = 2.0
 SHELL_INJECTION_MINIMUM_DELTA = 1.5
 REMOTE_SCRIPT_DIRECTORY = PurePosixPath("/home/owner/share/tmp/sdk_tools")
