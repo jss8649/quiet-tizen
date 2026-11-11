@@ -1,200 +1,202 @@
 {
-  "profile_version": 1,
-  "model": "UN75U7900FFXZA",
-  "firmware": "T-X22UDFAKUC-0090-1300.8",
-  "os": "Tizen 9.0.0 (TNINE, observed /etc/os-release)",
-  "kernel": "Linux 5.4.261 ARMv7 (observed via doctor)",
-  "runtime": "6.0.9 (observed: /usr/share/dotnet/shared/Microsoft.NETCore.App/6.0.9)",
-  "registry": "/opt/dbspace/.pkgmgr_parser.db",
-  "groups": {
-    "advertising": {
-      "description": "ACR, viewing-analysis, promotion and advertising components. Package names identify purpose; this is not a traffic audit.",
-      "app_ids": [
-        "com.samsung.tizen.samsung-analytics",
-        "com.samsung.tv.acr",
-        "com.samsung.tv.canalysis-service",
-        "com.samsung.tv.contents-recognition-dbmgr",
-        "com.samsung.tv.adagent-service",
-        "com.samsung.tv.pisa-service",
-        "org.tizen.pisa-control-service",
-        "com.samsung.tv.targeted-ad-service"
-      ]
-    },
-    "voice": {
-      "description": "Bixby, Alexa, wake-word and voice UI. Opt in only if voice functions are unwanted.",
-      "app_ids": [
-        "com.samsung.tv.alexa-client",
-        "com.samsung.tv.alexa-fullscreen-app",
-        "com.samsung.tv.bixby-context-client",
-        "com.samsung.tv.bixby-prov",
-        "com.samsung.tv.bixbycapsuleviewer",
-        "com.samsung.tv.mybixby",
-        "com.samsung.tv.ondevice-voice",
-        "com.samsung.tv.utterance-recommender-app",
-        "com.samsung.tv.utterance-recommender-core",
-        "com.samsung.tv.voice-instant-app",
-        "com.samsung.tv.voiceassistant-music",
-        "com.samsung.tv.wakeup-engine-alexa",
-        "com.samsung.tv.wakeup-engine-bixby",
-        "org.tizen.voice-app",
-        "org.tizen.voice-app-service",
-        "org.tizen.voice-client",
-        "org.tizen.voice-onboarding"
-      ]
-    },
-    "context": {
-      "description": "AI/context suggestions and content-grab features. May remove useful smart functions.",
-      "app_ids": [
-        "com.samsung.tv.AICompanionAgent",
-        "com.samsung.tv.AICompanionUI",
-        "com.samsung.tv.AICompanionUILauncher",
-        "com.samsung.tv.AICompanionUINotice",
-        "com.samsung.tv.ai-discovery-service",
-        "com.samsung.tv.ai-discovery-ui",
-        "com.samsung.tv.context-aware-agent",
-        "com.samsung.tv.context-aware-agent-toast-view",
-        "com.samsung.tv.context-aware-grab-control",
-        "com.samsung.tv.context-aware-server-requester",
-        "com.samsung.tv.context-aware-service",
-        "com.samsung.tv.vif",
-        "content-grab-service"
-      ]
-    },
-    "smart-extras": {
-      "description": "SmartThings, gaming-hub background helpers, health and ambience. Optional; HDMI-focused setup.",
-      "app_ids": [
-        "com.samsung.tizen.smartthings-client",
-        "com.samsung.tv.adplayer",
-        "com.samsung.tv.ambient-sound",
-        "com.samsung.tv.aov-dashboard",
-        "com.samsung.tv.ghdaemon",
-        "com.samsung.tv.ghservice",
-        "com.samsung.tv.health-mde-service",
-        "com.samsung.tv.health-mde-service-view",
-        "com.samsung.tv.smartthingsfind-daemon",
-        "com.samsung.tv.smartthingsfind-ondemand",
-        "samsunghealth-service-tv"
-      ]
-    },
-    "light-shell": {
-      "description": "Sidebar and browser. Apply only after launcher, QuickLaunch bridge and settings routing are validated.",
-      "app_ids": [
-        "com.samsung.tv.home.sidebar",
-        "org.tizen.browser"
-      ]
-    },
-    "tv-plus": {
-      "description": "Samsung TV Plus startup; removes access to that app until restored.",
-      "app_ids": [
-        "HEPsqFNie0.tvplusstandalone"
-      ]
-    }
+ "profile_version": 1,
+ "model": "UN75U7900FFXZA",
+ "firmware": "T-X22UDFAKUC-0090-1300.8",
+ "os": "Tizen 9.0.0 (TNINE, observed /etc/os-release)",
+ "kernel": "Linux 5.4.261 ARMv7 (observed via doctor)",
+ "runtime": "6.0.9 (observed: /usr/share/dotnet/shared/Microsoft.NETCore.App/6.0.9)",
+ "registry": "/opt/dbspace/.pkgmgr_parser.db",
+ "groups": {
+  "advertising": {
+   "description": "ACR, viewing-analysis, promotion and advertising components. Package names identify purpose; this is not a traffic audit.",
+   "app_ids": [
+    "com.samsung.tizen.samsung-analytics",
+    "com.samsung.tv.acr",
+    "com.samsung.tv.canalysis-service",
+    "com.samsung.tv.contents-recognition-dbmgr",
+    "com.samsung.tv.adagent-service",
+    "com.samsung.tv.pisa-service",
+    "org.tizen.pisa-control-service",
+    "com.samsung.tv.targeted-ad-service"
+   ]
   },
-  "stop_markers": [
-    {
-      "unit": "pisa-service.service",
-      "marker": "pisa-service",
-      "group": "advertising"
-    },
-    {
-      "unit": "canalysis-service.service",
-      "marker": "canalysis-daemon",
-      "group": "advertising"
-    },
-    {
-      "unit": "com.samsung.tv.bixby-prov.service",
-      "marker": "com.samsung.tv.bixby-prov",
-      "group": "voice"
-    },
-    {
-      "unit": "com.samsung.tv.ondevice-voice.service",
-      "marker": "com.samsung.tv.ondevice-voice",
-      "group": "voice"
-    },
-    {
-      "unit": "org.tizen.voice-app.service",
-      "marker": "org.tizen.voice-app",
-      "group": "voice"
-    },
-    {
-      "unit": "org.tizen.voice-client.service",
-      "marker": "org.tizen.voice-client",
-      "group": "voice"
-    },
-    {
-      "unit": "com.samsung.tv.context-aware-agent.service",
-      "marker": "com.samsung.tv.context-aware-agent",
-      "group": "context"
-    },
-    {
-      "unit": "com.samsung.tv.context-aware-service.service",
-      "marker": "com.samsung.tv.context-aware-service",
-      "group": "context"
-    },
-    {
-      "unit": "com.samsung.tv.AICompanionAgent.service",
-      "marker": "com.samsung.tv.AICompanionAgent",
-      "group": "context"
-    },
-    {
-      "unit": "com.samsung.tv.ghdaemon.service",
-      "marker": "com.samsung.tv.ghdaemon",
-      "group": "smart-extras"
-    },
-    {
-      "unit": "samsunghealth-service-tv.service",
-      "marker": "samsunghealth-service-tv",
-      "group": "smart-extras"
-    },
-    {
-      "unit": "slive-provider-daemon.service",
-      "marker": "slive-provider-daemon",
-      "group": "tv-plus"
-    }
-  ],
-  "runtime_only_masks": [
-    "ipa.service",
-    "contents-recognition-service.service",
-    "org.tizen.tv.sp-kpi.service",
-    "data-service.service"
-  ],
-  "preferences": [
-    {
-      "key": "db/was/preload_by_country",
-      "type": "string",
-      "value": "false"
-    },
-    {
-      "key": "db/menu/autorun_tv_plus",
-      "type": "bool",
-      "value": "0"
-    },
-    {
-      "key": "db/menu/voice/voice_activated",
-      "type": "bool",
-      "value": "0"
-    },
-    {
-      "key": "db/menu/voice/wakeupless_status",
-      "type": "int",
-      "value": "0"
-    },
-    {
-      "key": "db/si_service/voice_recog_enable",
-      "type": "bool",
-      "value": "0"
-    },
-    {
-      "key": "db/multi-assistant/prelaunch_mode",
-      "type": "bool",
-      "value": "0"
-    }
-  ],
-  "was_cache": {
-    "table": "WASConfigTable",
-    "row": "RESERVED_18",
-    "json_path": "$.rsp.preloadByCountry",
-    "after": "false"
+  "voice": {
+   "description": "Bixby, Alexa, wake-word and voice UI. Opt in only if voice functions are unwanted.",
+   "app_ids": [
+    "com.samsung.tv.alexa-client",
+    "com.samsung.tv.alexa-fullscreen-app",
+    "com.samsung.tv.bixby-context-client",
+    "com.samsung.tv.bixby-prov",
+    "com.samsung.tv.bixbycapsuleviewer",
+    "com.samsung.tv.mybixby",
+    "com.samsung.tv.ondevice-voice",
+    "com.samsung.tv.utterance-recommender-app",
+    "com.samsung.tv.utterance-recommender-core",
+    "com.samsung.tv.voice-instant-app",
+    "com.samsung.tv.voiceassistant-music",
+    "com.samsung.tv.wakeup-engine-alexa",
+    "com.samsung.tv.wakeup-engine-bixby",
+    "org.tizen.voice-app",
+    "org.tizen.voice-app-service",
+    "org.tizen.voice-client",
+    "org.tizen.voice-onboarding"
+   ]
   },
-  "cleanup_applied": "2026-11-10: 5 groups (50 app records), 12 stop markers, 4 runtime masks, 6 preferences, WAS cache row. light-shell deferred until launcher."
+  "context": {
+   "description": "AI/context suggestions and content-grab features. May remove useful smart functions.",
+   "app_ids": [
+    "com.samsung.tv.AICompanionAgent",
+    "com.samsung.tv.AICompanionUI",
+    "com.samsung.tv.AICompanionUILauncher",
+    "com.samsung.tv.AICompanionUINotice",
+    "com.samsung.tv.ai-discovery-service",
+    "com.samsung.tv.ai-discovery-ui",
+    "com.samsung.tv.context-aware-agent",
+    "com.samsung.tv.context-aware-agent-toast-view",
+    "com.samsung.tv.context-aware-grab-control",
+    "com.samsung.tv.context-aware-server-requester",
+    "com.samsung.tv.context-aware-service",
+    "com.samsung.tv.vif",
+    "content-grab-service"
+   ]
+  },
+  "smart-extras": {
+   "description": "SmartThings, gaming-hub background helpers, health and ambience. Optional; HDMI-focused setup.",
+   "app_ids": [
+    "com.samsung.tizen.smartthings-client",
+    "com.samsung.tv.adplayer",
+    "com.samsung.tv.ambient-sound",
+    "com.samsung.tv.aov-dashboard",
+    "com.samsung.tv.ghdaemon",
+    "com.samsung.tv.ghservice",
+    "com.samsung.tv.health-mde-service",
+    "com.samsung.tv.health-mde-service-view",
+    "com.samsung.tv.smartthingsfind-daemon",
+    "com.samsung.tv.smartthingsfind-ondemand",
+    "samsunghealth-service-tv"
+   ]
+  },
+  "light-shell": {
+   "description": "Sidebar and browser. Apply only after launcher, QuickLaunch bridge and settings routing are validated.",
+   "app_ids": [
+    "com.samsung.tv.home.sidebar",
+    "org.tizen.browser"
+   ],
+   "applied": "2026-11-10 after launcher + settings bridge validation (shell-01)"
+  },
+  "tv-plus": {
+   "description": "Samsung TV Plus startup; removes access to that app until restored.",
+   "app_ids": [
+    "HEPsqFNie0.tvplusstandalone"
+   ]
+  }
+ },
+ "stop_markers": [
+  {
+   "unit": "pisa-service.service",
+   "marker": "pisa-service",
+   "group": "advertising"
+  },
+  {
+   "unit": "canalysis-service.service",
+   "marker": "canalysis-daemon",
+   "group": "advertising"
+  },
+  {
+   "unit": "com.samsung.tv.bixby-prov.service",
+   "marker": "com.samsung.tv.bixby-prov",
+   "group": "voice"
+  },
+  {
+   "unit": "com.samsung.tv.ondevice-voice.service",
+   "marker": "com.samsung.tv.ondevice-voice",
+   "group": "voice"
+  },
+  {
+   "unit": "org.tizen.voice-app.service",
+   "marker": "org.tizen.voice-app",
+   "group": "voice"
+  },
+  {
+   "unit": "org.tizen.voice-client.service",
+   "marker": "org.tizen.voice-client",
+   "group": "voice"
+  },
+  {
+   "unit": "com.samsung.tv.context-aware-agent.service",
+   "marker": "com.samsung.tv.context-aware-agent",
+   "group": "context"
+  },
+  {
+   "unit": "com.samsung.tv.context-aware-service.service",
+   "marker": "com.samsung.tv.context-aware-service",
+   "group": "context"
+  },
+  {
+   "unit": "com.samsung.tv.AICompanionAgent.service",
+   "marker": "com.samsung.tv.AICompanionAgent",
+   "group": "context"
+  },
+  {
+   "unit": "com.samsung.tv.ghdaemon.service",
+   "marker": "com.samsung.tv.ghdaemon",
+   "group": "smart-extras"
+  },
+  {
+   "unit": "samsunghealth-service-tv.service",
+   "marker": "samsunghealth-service-tv",
+   "group": "smart-extras"
+  },
+  {
+   "unit": "slive-provider-daemon.service",
+   "marker": "slive-provider-daemon",
+   "group": "tv-plus"
+  }
+ ],
+ "runtime_only_masks": [
+  "ipa.service",
+  "contents-recognition-service.service",
+  "org.tizen.tv.sp-kpi.service",
+  "data-service.service"
+ ],
+ "preferences": [
+  {
+   "key": "db/was/preload_by_country",
+   "type": "string",
+   "value": "false"
+  },
+  {
+   "key": "db/menu/autorun_tv_plus",
+   "type": "bool",
+   "value": "0"
+  },
+  {
+   "key": "db/menu/voice/voice_activated",
+   "type": "bool",
+   "value": "0"
+  },
+  {
+   "key": "db/menu/voice/wakeupless_status",
+   "type": "int",
+   "value": "0"
+  },
+  {
+   "key": "db/si_service/voice_recog_enable",
+   "type": "bool",
+   "value": "0"
+  },
+  {
+   "key": "db/multi-assistant/prelaunch_mode",
+   "type": "bool",
+   "value": "0"
+  }
+ ],
+ "was_cache": {
+  "table": "WASConfigTable",
+  "row": "RESERVED_18",
+  "json_path": "$.rsp.preloadByCountry",
+  "after": "false"
+ },
+ "cleanup_applied": "2026-11-10: 6 groups applied; 51 records disabled (52 touched, com.samsung.tv.AICompanionUI re-enabled as the launcher container). 12 stop markers, 4 runtime masks (boot-scoped: reapply after each reboot), 6 preferences, WAS RESERVED_18=false.",
+ "launcher_applied": "2026-11-10: Quiet Home installed into com.samsung.tv.AICompanionUI (dotnet-inhouse, 36 privileges; bixby-promotion does not exist on this firmware). dll=AICompanionUI.dll, owner 201:0, runtime uid 5001, Root=/opt/usr/apps/com.samsung.tv.AICompanionUI/res/quiet-home/. Sources probed live: 0=TV, 13=CoreELEC/Kodi behind soundbar, 14=Nintendo Switch, 56=HDHomeRun DLNA. home_appid/startup_appid/Probe handler -> AICompanionUI (originals com.samsung.tv.csfs / org.tizen.tv-viewer saved in home-01). Settings bridge: QuickLaunch.dll replaced; 3 key_filter rows repointed incl. the ~alive-package:org.tizen.function-osd fallback unique to this firmware. Backups: home-01, shell-01. TV-side SVG rasterizer drops <text> elements - artwork must be path/shape based."
 }

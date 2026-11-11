@@ -40,6 +40,26 @@
     "Height": 360
   },
   {
+    "Name": "Live TV",
+    "Id": "org.tizen.tv-viewer",
+    "Asset": "placeholders/card-6.svg",
+    "Description": "Antenna & channels",
+    "Fit": "cover",
+    "Background": "#0F2B46",
+    "Width": 640,
+    "Height": 360
+  },
+  {
+    "Name": "Browser",
+    "Id": "org.tizen.browser",
+    "Asset": "placeholders/card-9.svg",
+    "Description": "Web browser",
+    "Fit": "cover",
+    "Background": "#1A1D26",
+    "Width": 640,
+    "Height": 360
+  },
+  {
     "Name": "Disney+",
     "Id": "MCmYXNxgcu.DisneyPlus",
     "Asset": "placeholders/card-4.svg",
@@ -56,16 +76,6 @@
     "Description": "Movies & series",
     "Fit": "cover",
     "Background": "#000000",
-    "Width": 640,
-    "Height": 360
-  },
-  {
-    "Name": "Spotify",
-    "Id": "rJeHak5zRg.Spotify",
-    "Asset": "placeholders/card-6.svg",
-    "Description": "Music & podcasts",
-    "Fit": "cover",
-    "Background": "#1ED760",
     "Width": 640,
     "Height": 360
   },
