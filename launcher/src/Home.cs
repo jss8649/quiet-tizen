@@ -10,7 +10,7 @@ using Tizen.Applications;
 
 public sealed class QuietHome : NUIApplication
 {
- const string Root="/opt/usr/apps/com.samsung.tv.bixby-promotion/res/quiet-home/";
+ const string Root="/opt/usr/apps/com.samsung.tv.AICompanionUI/res/quiet-home/";
  const string StateFile="/tmp/quiet-home-state.txt";
  sealed class Slot { public View Card,Shadow,FocusRing; public TextLabel Label; public string Name,Action,Description; public int Row,X,Y,W,H; }
  sealed class CachedArtwork { public ImageView Image; public View Parent; }
@@ -28,7 +28,7 @@ public sealed class QuietHome : NUIApplication
  Animation focusAnimation;
  bool fontLoaded;
  Tizen.NUI.Timer clockTimer;
- int page, selected, area=1, lastSource=14;
+ int page, selected, area=1, lastSource=13;
  string editing="";
  long buildMilliseconds;
  int currentVolume, currentMute;
@@ -79,7 +79,7 @@ public sealed class QuietHome : NUIApplication
  void Home(string activity){clockTimer?.Start();RefreshSource();if(tabs!=null){bool unchanged=page==0&&area==1&&editing==""&&selected==SourceIndex();page=0;area=1;editing="";selected=SourceIndex();if(!unchanged)BuildPage();WriteState(activity);}}
  void OpenSettings(string activity){clockTimer?.Start();page=2;area=1;selected=0;editing="";BuildPage();WriteState(activity);}
  void RefreshSource(){try{int n;if(vconf_get_int("memory/system/source_type",out n)==0&&n>=13&&n<=15)lastSource=n;}catch{}}
- int SourceIndex(){return lastSource==15?1:lastSource==13?2:0;}
+ int SourceIndex(){return lastSource==14?1:0;}
  View Add(View v){scene.Add(v);Window.Default.Add(v);return v;}
  View Panel(int x,int y,int w,int h,Color color,int radius=18){return Add(new View{Position2D=new Position2D(x,y),Size2D=new Size2D(w,h),BackgroundColor=color,CornerRadius=new Vector4(radius,radius,radius,radius)});}
  TextLabel Text(string text,int x,int y,int w,int h,float size,Color color,string face="Medium")
@@ -98,12 +98,11 @@ public sealed class QuietHome : NUIApplication
   for(int i=0;i<3;i++){tabs[i]=Text(nav[i],tx[i],158,tw[i],68,30,muted);tabs[i].HorizontalAlignment=HorizontalAlignment.Center;}
   clock=Text(DateTime.Now.ToString("h:mm tt"),1540,170,300,45,24,muted);clock.HorizontalAlignment=HorizontalAlignment.End;
   if(page==0){
-   var hero=Feature("PlayStation 5","hdmi:14","Game console · HDMI 2","feature-ps5.svg",80,262,1040,442,"hero");
-   hero.Card.Add(Label("PLAYSTATION 5",44,52,550,40,24,new Color(.86f,.91f,1,1),"Semibold"));
-   hero.Card.Add(Label("Let's play.",40,124,560,100,72,white,"Display"));
-   hero.Card.Add(Label("Switch to HDMI 2",46,246,440,48,30,new Color(.88f,.93f,1,1)));
-   Feature("Nintendo Switch","hdmi:15","Game console · HDMI 3","feature-switch.svg",1160,262,320,442,"portrait");
-   Feature("HDMI 1","hdmi:13","External device","feature-hdmi.svg",1520,262,320,442,"portrait");
+   var hero=Feature("Kodi","hdmi:13","CoreELEC media center · HDMI","feature-kodi.svg",80,262,1040,442,"hero");
+   hero.Card.Add(Label("COREELEC",44,52,550,40,24,new Color(.86f,.91f,1,1),"Semibold"));
+   hero.Card.Add(Label("Let's watch.",40,124,560,100,72,white,"Display"));
+   hero.Card.Add(Label("Switch to Kodi input",46,246,440,48,30,new Color(.88f,.93f,1,1)));
+   Feature("Nintendo Switch","hdmi:14","Game console · HDMI","feature-switch.svg",1160,262,320,442,"portrait");
   }else if(page==1){
    BuildLibrary();
   }else{
@@ -113,7 +112,7 @@ public sealed class QuietHome : NUIApplication
    SettingsTile("Game Mode","game-mode","Select to switch on or off","game",2,0);
    SettingsTile("Sleep Timer","sleeptimer","Select to change the timer","sleep",3,0);
    SettingsTile("Sound","mute","Select to mute or unmute","mute",0,1);
-   SettingsTile("Controllers","controllers","DualSense · hold PS + Create","controller",1,1);
+   SettingsTile("Controllers","controllers","Gamepad pairing","controller",1,1);
    SettingsTile("Network","network","Wi-Fi and connection setup","network",2,1);
    SettingsTile("Advanced","app:org.tizen.menu","Open Samsung's full settings","settings",3,1);
   }
@@ -122,8 +121,8 @@ public sealed class QuietHome : NUIApplication
   Dock("Netflix","app:org.tizen.netflix-app","netflix",0);
   Dock("YouTube","app:com.samsung.tv.cobalt-yt","youtube",1);
   Dock("Prime Video","app:org.tizen.primevideo","prime",2);
-  Dock("PlayStation 5","hdmi:14","ps5",3);
-  Dock("Nintendo Switch","hdmi:15","switch",4);
+  Dock("Kodi","hdmi:13","kodi",3);
+  Dock("Nintendo Switch","hdmi:14","switch",4);
   Dock("Your Apps","page:1","apps",5);
   }
   Toolbar("Apps","page:1","apps",0);Toolbar("Inputs","page:0","hdmi",1);Toolbar("Settings","page:2","settings",2);

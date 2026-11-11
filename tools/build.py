@@ -38,7 +38,7 @@ def main():
     if args.target in ("launcher", "all"):
         destination = ROOT / ".local/package"
         destination.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(ROOT / ".local/build/Home/BixbyPromotion.dll", destination / "BixbyPromotion.dll")
+        shutil.copyfile(ROOT / ".local/build/Home/AICompanionUI.dll", destination / "AICompanionUI.dll")
         shutil.copyfile(ROOT / ".local/build/QuickLaunch/QuickLaunch.dll", destination / "QuickLaunch.dll")
         shutil.copyfile(ROOT / ".local/build/Probe/Probe.dll", destination / "Probe.dll")
         assets = destination / "quiet-home"

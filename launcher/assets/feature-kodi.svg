@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="442" viewBox="0 0 1040 442">
+  <!-- Neutral media-hub hero tile: widescreen display + play glyph.
+       Hand-authored shapes only — the TV rasterizer drops <text>, and official
+       marks stay out of the tree (drop branded variants into .local/ instead). -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#141a2e"/>
+      <stop offset=".55" stop-color="#101526"/>
+      <stop offset="1" stop-color="#0b0f1d"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".42" r=".6">
+      <stop offset="0" stop-color="#1c3b57" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#0b0f1d" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1040" height="442" rx="18" fill="url(#bg)"/>
+  <circle cx="520" cy="185" r="290" fill="url(#glow)"/>
+  <g fill="none" stroke="#8fb8ff" stroke-opacity=".08">
+    <path d="M0 342 H1040 M0 242 H1040 M0 142 H1040"/>
+    <path d="M260 0 V442 M520 0 V442 M780 0 V442"/>
+  </g>
+  <circle cx="880" cy="70" r="120" fill="none" stroke="#22304e" stroke-width="2" opacity=".8"/>
+  <circle cx="880" cy="70" r="180" fill="none" stroke="#22304e" stroke-width="2" opacity=".5"/>
+  <path d="M40 400 Q520 340 1000 400" stroke="#17233c" stroke-width="60" fill="none" opacity=".6"/>
+  <!-- widescreen display -->
+  <rect x="300" y="88" width="440" height="252" rx="16" fill="#0a0e1a" stroke="#2e4166" stroke-width="3"/>
+  <rect x="316" y="104" width="408" height="204" rx="10" fill="#0d1526"/>
+  <!-- play glyph -->
+  <path d="M484 166 L586 206 L484 246 Z" fill="#ffffff"/>
+  <path d="M484 166 L586 206 L484 246 Z" fill="none" stroke="#17b2e7" stroke-width="4" opacity=".6"/>
+  <!-- stand + rising signal bars -->
+  <rect x="468" y="352" width="104" height="10" rx="4" fill="#2e4166"/>
+  <rect x="428" y="372" width="10" height="18" rx="3" fill="#2e4166"/>
+  <rect x="450" y="364" width="10" height="26" rx="3" fill="#3a508a"/>
+  <rect x="472" y="356" width="10" height="34" rx="3" fill="#3a508a"/>
+  <rect x="494" y="348" width="10" height="42" rx="3" fill="#46629f"/>
+  <rect x="516" y="340" width="10" height="50" rx="3" fill="#5474b5"/>
+  <rect x="538" y="332" width="10" height="58" rx="3" fill="#6486c9"/>
+  <rect x="560" y="324" width="10" height="66" rx="3" fill="#ffffff"/>
+</svg>

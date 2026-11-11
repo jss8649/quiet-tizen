@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="253" height="126" viewBox="0 0 253 126">
+  <!-- Neutral media-hub dock tile: play glyph on dark rounded square.
+       Shapes only (TV rasterizer drops <text>); branded art lives in .local/. -->
+  <defs>
+    <linearGradient id="kg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#141a2e"/>
+      <stop offset="1" stop-color="#0b0f1d"/>
+    </linearGradient>
+    <radialGradient id="kglow" cx=".5" cy=".4" r=".8">
+      <stop offset="0" stop-color="#1c3b57" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#0b0f1d" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="253" height="126" rx="18" fill="url(#kg)"/>
+  <rect width="253" height="126" rx="18" fill="url(#kglow)"/>
+  <rect x="1.5" y="1.5" width="250" height="123" rx="17" fill="none" stroke="#8fb8ff" stroke-opacity=".3" stroke-width="3"/>
+  <!-- play glyph in a screen-shaped keyline -->
+  <rect x="78" y="26" width="97" height="62" rx="10" fill="none" stroke="#2e4166" stroke-width="3"/>
+  <path d="M114 42 L142 57 L114 72 Z" fill="#ffffff"/>
+  <path d="M114 42 L142 57 L114 72 Z" fill="none" stroke="#17b2e7" stroke-width="2" opacity=".6"/>
+  <rect x="112" y="94" width="29" height="5" rx="2.5" fill="#2e4166"/>
+</svg>

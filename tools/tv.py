@@ -19,7 +19,8 @@ sys.path.insert(0, str(ROOT / "vendor"))
 from samsung_tv_root.archive_root import probe, _check_target, _capture
 from samsung_tv_root.sdb import SdbClient, find_sdb
 
-PROFILE = json.loads((ROOT / "profiles/un75u8000ffxza-1300.9.json").read_text())
+profile_rel = os.environ.get("QTV_PROFILE", "profiles/un75u8000ffxza-1300.9.json")
+PROFILE = json.loads((ROOT / profile_rel).read_text())
 STAGE = "/home/owner/share/tmp/sdk_tools/quiet-tizen"
 
 
@@ -146,7 +147,7 @@ def main():
         if len(script) > 45000:
             raise ValueError("Script too large for the bounded command channel; split into phases.")
         encoded = base64.b64encode(script).decode()
-        command = f"printf '%s' {shlex.quote(encoded)} | /bin/sh -s -- " + shlex.join(args.arg)
+        command = f"printf '%s' {shlex.quote(encoded)} | base64 -d | /bin/sh -s -- " + shlex.join(args.arg)
     else:
         if args.arg:
             raise ValueError("--arg requires --script.")
